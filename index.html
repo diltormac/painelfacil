@@ -1,0 +1,1034 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <title>OS Fácil — Painel de Ordens de Serviço</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      * { box-sizing: border-box; }
+      body { font-family: "Inter", sans-serif; }
+
+      ::-webkit-scrollbar { width: 8px; height: 8px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+      ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+      .sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        color: #94a3b8;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.15s;
+        cursor: pointer;
+      }
+      .sidebar-link:hover { background: rgba(255, 255, 255, 0.05); color: white; }
+      .sidebar-link.active {
+        background: linear-gradient(90deg, rgba(67, 94, 219, 0.2), rgba(67, 94, 219, 0.05));
+        color: white;
+        border-left: 3px solid #435edb;
+        padding-left: 11px;
+      }
+      .sidebar-link i { width: 18px; text-align: center; font-size: 14px; }
+
+      .stat-card {
+        background: white;
+        border: 1px solid #e6eaf0;
+        border-radius: 14px;
+        padding: 14px;
+        transition: all 0.2s;
+      }
+      @media (min-width: 1024px) {
+        .stat-card { padding: 18px; }
+      }
+      .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px -8px rgba(23, 32, 51, 0.12);
+      }
+
+      .table-row { transition: background 0.15s; cursor: pointer; }
+      .table-row:hover { background: #f8fafc; }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+      .badge-pendente { background: #fef3c7; color: #92400e; }
+      .badge-pendente .badge-dot { background: #f59e0b; }
+      .badge-andamento { background: #dbeafe; color: #1e40af; }
+      .badge-andamento .badge-dot { background: #3b82f6; }
+      .badge-concluido { background: #dcfce7; color: #166534; }
+      .badge-concluido .badge-dot { background: #22c55e; }
+      .badge-cancelado { background: #fee2e2; color: #991b1b; }
+      .badge-cancelado .badge-dot { background: #ef4444; }
+
+      .search-input:focus {
+        outline: none;
+        border-color: #435edb;
+        box-shadow: 0 0 0 3px rgba(67, 94, 219, 0.12);
+      }
+
+      .filter-btn {
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.15s;
+        border: 1px solid #e6eaf0;
+        background: white;
+        color: #465166;
+        cursor: pointer;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 34px; /* Altura fixa para igualar com o select */
+      }
+      .filter-btn:hover { background: #f1f5f9; }
+      .filter-btn.active { background: #435edb; color: white; border-color: #435edb; }
+
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        z-index: 50;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+      }
+      @media (min-width: 640px) {
+        .modal-overlay { padding: 24px; }
+      }
+      .modal-overlay.show { opacity: 1; pointer-events: auto; }
+      .modal-content {
+        background: white;
+        border-radius: 18px;
+        width: 100%;
+        max-width: 720px;
+        max-height: 95vh;
+        overflow-y: auto;
+        transform: scale(0.95);
+        transition: transform 0.2s;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      }
+      @media (min-width: 640px) {
+        .modal-content { max-height: 90vh; }
+      }
+      .modal-overlay.show .modal-content { transform: scale(1); }
+
+      .photo-thumb {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 1px solid #e6eaf0;
+        cursor: pointer;
+        transition: transform 0.15s;
+      }
+      .photo-thumb:hover { transform: scale(1.03); }
+
+      .toast {
+        position: fixed;
+        bottom: 16px;
+        left: 16px;
+        right: 16px;
+        padding: 14px 20px;
+        border-radius: 12px;
+        color: white;
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+        z-index: 100;
+        transform: translateY(100px);
+        opacity: 0;
+        transition: all 0.3s;
+        text-align: center;
+      }
+      @media (min-width: 640px) {
+        .toast { left: auto; right: 24px; bottom: 24px; text-align: left; }
+      }
+      .toast.show { transform: translateY(0); opacity: 1; }
+      .toast-success { background: #16a34a; }
+      .toast-error { background: #dc2626; }
+
+      .lightbox {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 200;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+        padding: 20px;
+      }
+      .lightbox.show { opacity: 1; pointer-events: auto; }
+      .lightbox img {
+        max-width: 100%;
+        max-height: 90vh;
+        border-radius: 8px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        transform: scale(0.95);
+        transition: transform 0.3s;
+      }
+      .lightbox.show img { transform: scale(1); }
+      .lightbox-close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s;
+        font-size: 20px;
+        border: none;
+      }
+      .lightbox-close:hover { background: rgba(255, 255, 255, 0.2); }
+
+      .edit-input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #172033;
+        outline: none;
+        transition: border-color 0.2s;
+        background: white;
+      }
+      .edit-input:focus {
+        border-color: #435edb;
+        box-shadow: 0 0 0 2px rgba(67, 94, 219, 0.1);
+      }
+    </style>
+  </head>
+  <body class="bg-slate-100 h-screen overflow-hidden flex">
+
+    <!-- ============ OVERLAY (mobile) ============ -->
+    <div
+      id="sidebarOverlay"
+      class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-30 hidden lg:hidden"
+      onclick="fecharSidebar()"
+    ></div>
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside
+      id="sidebar"
+      class="fixed lg:static inset-y-0 left-0 z-40 w-64 bg-slate-900 text-white flex flex-col flex-shrink-0 border-r border-slate-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-out"
+    >
+      <div class="px-5 py-5 border-b border-slate-800 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-lg shadow-indigo-900/40 flex-shrink-0">
+          <i class="fa-solid fa-clipboard-list text-lg"></i>
+        </div>
+        <div class="min-w-0">
+          <p class="font-extrabold text-base leading-none">OS Fácil</p>
+          <p class="text-[10px] text-slate-400 mt-1 tracking-wider uppercase">Painel Admin</p>
+        </div>
+        <button
+          onclick="fecharSidebar()"
+          class="lg:hidden ml-auto w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center text-slate-400"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <p class="text-[10px] text-slate-500 font-bold uppercase px-3 mb-2 tracking-wider">Principal</p>
+        <a class="sidebar-link active" data-view="dashboard">
+          <i class="fa-solid fa-chart-pie"></i>Dashboard
+        </a>
+        <a class="sidebar-link" data-view="os">
+          <i class="fa-solid fa-clipboard-list"></i>Todas as OS
+          <span id="badgeTotal" class="ml-auto bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+        </a>
+        <a class="sidebar-link" data-view="fotos">
+          <i class="fa-solid fa-images"></i>Galeria de Fotos
+        </a>
+
+        <p class="text-[10px] text-slate-500 font-bold uppercase px-3 mt-5 mb-2 tracking-wider">Filtros rápidos</p>
+        <a class="sidebar-link" data-filter="Pendente">
+          <i class="fa-solid fa-clock text-amber-400"></i>Pendentes
+          <span id="badgePendente" class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300">0</span>
+        </a>
+        <a class="sidebar-link" data-filter="Em andamento">
+          <i class="fa-solid fa-spinner text-blue-400"></i>Em andamento
+          <span id="badgeAndamento" class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300">0</span>
+        </a>
+        <a class="sidebar-link" data-filter="Concluído">
+          <i class="fa-solid fa-circle-check text-green-400"></i>Concluídos
+          <span id="badgeConcluido" class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-500/20 text-green-300">0</span>
+        </a>
+      </nav>
+
+      <div class="px-4 py-4 border-t border-slate-800 flex items-center gap-3">
+        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">AD</div>
+        <div class="min-w-0">
+          <p class="text-sm font-semibold truncate">Admin</p>
+          <p class="text-[10px] text-slate-400 truncate">admin@osfacil.com</p>
+        </div>
+        <button class="ml-auto text-slate-400 hover:text-white transition flex-shrink-0">
+          <i class="fa-solid fa-right-from-bracket text-sm"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+    <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+      <header class="bg-white border-b border-slate-200 flex-shrink-0">
+        <div class="px-3 md:px-6 py-3 flex items-center gap-2 md:gap-3 flex-wrap">
+          <button
+            id="mobileMenuBtn"
+            onclick="abrirSidebar()"
+            class="lg:hidden w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 flex-shrink-0"
+          >
+            <i class="fa-solid fa-bars text-sm"></i>
+          </button>
+
+          <div class="min-w-0">
+            <h1 id="pageTitle" class="text-base md:text-lg font-bold text-slate-800 truncate">Dashboard</h1>
+            <p id="pageSubtitle" class="text-[10px] md:text-xs text-slate-500 truncate hidden sm:block">
+              Visão geral das ordens de serviço
+            </p>
+          </div>
+
+          <button
+            onclick="carregarDados()"
+            class="md:ml-0 ml-auto md:order-last w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 flex-shrink-0"
+            title="Atualizar dados"
+          >
+            <i class="fa-solid fa-rotate-right text-sm"></i>
+          </button>
+
+          <div class="relative order-last w-full md:order-none md:w-64 lg:w-72 md:ml-auto">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Buscar OS, cliente, telefone..."
+              class="search-input w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 placeholder:text-slate-400 transition"
+            />
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
+        <!-- ============ DASHBOARD VIEW ============ -->
+        <div id="viewDashboard" class="space-y-4 lg:space-y-6">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+            <div class="stat-card">
+              <div class="flex items-start justify-between mb-2 lg:mb-3">
+                <div class="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
+                  <i class="fa-solid fa-clipboard-list text-indigo-600 text-sm lg:text-base"></i>
+                </div>
+                <span class="text-[9px] lg:text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                  <i class="fa-solid fa-arrow-up mr-1"></i>Total
+                </span>
+              </div>
+              <p class="text-xl lg:text-2xl font-extrabold text-slate-800" id="statTotal">0</p>
+              <p class="text-[10px] lg:text-xs text-slate-500 mt-1 leading-tight">Ordens cadastradas</p>
+            </div>
+
+            <div class="stat-card">
+              <div class="flex items-start justify-between mb-2 lg:mb-3">
+                <div class="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+                  <i class="fa-solid fa-clock text-amber-600 text-sm lg:text-base"></i>
+                </div>
+              </div>
+              <p class="text-xl lg:text-2xl font-extrabold text-slate-800" id="statPendente">0</p>
+              <p class="text-[10px] lg:text-xs text-slate-500 mt-1 leading-tight">Pendentes</p>
+            </div>
+
+            <div class="stat-card">
+              <div class="flex items-start justify-between mb-2 lg:mb-3">
+                <div class="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                  <i class="fa-solid fa-spinner text-blue-600 text-sm lg:text-base"></i>
+                </div>
+              </div>
+              <p class="text-xl lg:text-2xl font-extrabold text-slate-800" id="statAndamento">0</p>
+              <p class="text-[10px] lg:text-xs text-slate-500 mt-1 leading-tight">Em andamento</p>
+            </div>
+
+            <div class="stat-card">
+              <div class="flex items-start justify-between mb-2 lg:mb-3">
+                <div class="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                  <i class="fa-solid fa-dollar-sign text-emerald-600 text-sm lg:text-base"></i>
+                </div>
+              </div>
+              <p class="text-sm lg:text-xl font-extrabold text-slate-800 whitespace-nowrap overflow-hidden text-ellipsis" id="statFaturamento">R$ 0,00</p>
+              <p class="text-[10px] lg:text-xs text-slate-500 mt-1 leading-tight">Faturamento total</p>
+            </div>
+          </div>
+
+          <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+            <div class="px-4 lg:px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50 gap-3">
+              <div class="min-w-0">
+                <h2 class="font-bold text-slate-800 text-sm lg:text-base">Últimas ordens de serviço</h2>
+                <p class="text-[10px] lg:text-xs text-slate-500 mt-0.5">As 10 mais recentes do banco</p>
+              </div>
+              <button
+                class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 flex-shrink-0"
+                onclick="mudarView('os')"
+              >
+                Ver todas <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </button>
+            </div>
+            <div id="recentList" class="flex flex-col"></div>
+          </div>
+        </div>
+
+        <!-- ============ OS VIEW ============ -->
+        <div id="viewOS" class="hidden space-y-3 lg:space-y-4">
+          <!-- Ajuste de alinhamento aqui -->
+          <div class="flex items-center gap-2">
+            <div class="flex gap-2 overflow-x-auto lg:pb-0 pb-1 flex-1 min-w-0">
+              <button class="filter-btn active flex-shrink-0" data-status="all">Todas</button>
+              <button class="filter-btn flex-shrink-0" data-status="Pendente">Pendentes</button>
+              <button class="filter-btn flex-shrink-0" data-status="Em andamento">Em andamento</button>
+              <button class="filter-btn flex-shrink-0" data-status="Concluído">Concluídas</button>
+              <button class="filter-btn flex-shrink-0" data-status="Cancelado">Canceladas</button>
+            </div>
+            <select
+              id="sortSelect"
+              class="flex-shrink-0 self-center h-[34px] px-2 lg:px-3 border border-slate-200 rounded-lg text-[11px] lg:text-xs font-semibold text-slate-700 focus:outline-none focus:border-indigo-500 bg-white"
+            >
+              <option value="data-desc">Recentes</option>
+              <option value="data-asc">Antigas</option>
+              <option value="nome-asc">A-Z</option>
+              <option value="nome-desc">Z-A</option>
+            </select>
+          </div>
+
+          <!-- Tabela (desktop) -->
+          <div id="desktopOSWrapper" class="hidden lg:block bg-white border border-slate-200 rounded-2xl overflow-hidden">
+            <table class="w-full">
+              <thead class="bg-slate-50 border-b border-slate-200">
+                <tr>
+                  <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">Nº OS</th>
+                  <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">Cliente</th>
+                  <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">Telefone</th>
+                  <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">Serviço</th>
+                  <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">Qtd</th>
+                  <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">Valor</th>
+                  <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">Status</th>
+                  <th class="text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+
+          <!-- Cards (mobile / tablet) -->
+          <div id="mobileOSWrapper" class="lg:hidden space-y-3">
+            <div id="mobileList" class="space-y-3"></div>
+          </div>
+
+          <!-- Estado vazio (compartilhado) -->
+          <div id="emptyState" class="hidden bg-white border border-slate-200 rounded-2xl px-5 py-16 text-center">
+            <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
+              <i class="fa-solid fa-inbox text-2xl text-slate-400"></i>
+            </div>
+            <p class="text-sm font-semibold text-slate-700">Nenhuma OS encontrada</p>
+            <p class="text-xs text-slate-500 mt-1">Tente ajustar os filtros ou a busca.</p>
+          </div>
+        </div>
+
+        <!-- ============ FOTOS VIEW ============ -->
+        <div id="viewFotos" class="hidden">
+          <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 lg:p-6">
+            <div class="flex items-center justify-between mb-4 lg:mb-5 gap-3">
+              <div class="min-w-0">
+                <h2 class="font-bold text-slate-800 text-sm lg:text-base">Galeria de fotos</h2>
+                <p class="text-[10px] lg:text-xs text-slate-500 mt-0.5">Todas as fotos enviadas nas OS</p>
+              </div>
+              <span id="fotosCount" class="text-[10px] lg:text-xs font-bold text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-full whitespace-nowrap">
+                0 fotos
+              </span>
+            </div>
+            <div id="galeriaGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 lg:gap-3"></div>
+            <div id="galeriaEmpty" class="hidden py-16 text-center">
+              <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
+                <i class="fa-solid fa-images text-2xl text-slate-400"></i>
+              </div>
+              <p class="text-sm font-semibold text-slate-700">Nenhuma foto cadastrada</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ================= MODAL ================= -->
+    <div id="modalDetalhes" class="modal-overlay">
+      <div class="modal-content">
+        <div class="sticky top-0 bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between rounded-t-[18px] z-10">
+          <div class="min-w-0">
+            <h2 class="font-bold text-slate-800 text-sm sm:text-base" id="modalTitle">Editar OS</h2>
+            <p class="text-[10px] sm:text-xs text-slate-500 mt-0.5 truncate" id="modalSubtitle"></p>
+          </div>
+          <button onclick="fecharModal()" class="w-9 h-9 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 transition flex-shrink-0">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div id="modalBody" class="p-3 sm:p-6 space-y-4 sm:space-y-5"></div>
+      </div>
+    </div>
+
+    <!-- ================= LIGHTBOX ================= -->
+    <div id="lightbox" class="lightbox" onclick="fecharLightbox(event)">
+      <button class="lightbox-close" onclick="fecharLightbox(event)">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <img id="lightboxImg" src="" alt="Visualização da foto" onclick="event.stopPropagation()" />
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+      const supabaseUrl = "https://kiiswukzwwoznkgjyaod.supabase.co";
+      const supabaseKey = "sb_publishable_WPRvraB-40Fz1RuKbd5bRg_3tGvyAxg";
+      const { createClient } = supabase;
+      const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+      let listaOS = [];
+      let estado = {
+        view: "dashboard",
+        filtroStatus: "all",
+        busca: "",
+        ordenacao: "data-desc",
+      };
+
+      const statusClass = {
+        Pendente: "badge-pendente",
+        "Em andamento": "badge-andamento",
+        Concluído: "badge-concluido",
+        Cancelado: "badge-cancelado",
+      };
+
+      function badge(status) {
+        return `<span class="badge ${statusClass[status] || "badge-pendente"}"><span class="badge-dot"></span>${status}</span>`;
+      }
+
+      function formatarData(iso) {
+        if (!iso) return "-";
+        const d = new Date(iso);
+        return d.toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      function formatarMoeda(valor) {
+        if (valor === null || valor === undefined || isNaN(valor)) return "R$ 0,00";
+        return Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+      }
+
+      function toast(msg, tipo = "success") {
+        const el = document.getElementById("toast");
+        el.textContent = msg;
+        el.className = `toast toast-${tipo} show`;
+        setTimeout(() => el.classList.remove("show"), 3000);
+      }
+
+      /* ---------- SIDEBAR MOBILE ---------- */
+      function abrirSidebar() {
+        document.getElementById("sidebar").classList.remove("-translate-x-full");
+        document.getElementById("sidebarOverlay").classList.remove("hidden");
+      }
+      function fecharSidebar() {
+        document.getElementById("sidebar").classList.add("-translate-x-full");
+        document.getElementById("sidebarOverlay").classList.add("hidden");
+      }
+
+      /* ---------- LIGHTBOX ---------- */
+      function abrirLightbox(url) {
+        if (!url) return;
+        const img = document.getElementById("lightboxImg");
+        const box = document.getElementById("lightbox");
+        img.src = url;
+        box.classList.add("show");
+      }
+      function fecharLightbox(event) {
+        if (event.target.id === "lightbox" || event.target.closest(".lightbox-close")) {
+          const box = document.getElementById("lightbox");
+          box.classList.remove("show");
+          setTimeout(() => { document.getElementById("lightboxImg").src = ""; }, 300);
+        }
+      }
+
+      /* ---------- CARREGAMENTO ---------- */
+      async function carregarDados() {
+        try {
+          const { data, error } = await supabaseClient
+            .from("ordens_servico")
+            .select("*")
+            .order("created_at", { ascending: false });
+          if (error) throw error;
+          listaOS = data.map((item) => ({ ...item, status: item.status || "Pendente" }));
+          atualizarTudo();
+        } catch (error) {
+          console.error(error);
+          toast("Erro ao carregar dados do banco.", "error");
+        }
+      }
+
+      function atualizarTudo() {
+        renderDashboard();
+        renderOS();
+        renderGaleria();
+      }
+
+      /* ---------- DASHBOARD ---------- */
+      function renderDashboard() {
+        document.getElementById("statTotal").textContent = listaOS.length;
+        document.getElementById("statPendente").textContent = listaOS.filter((o) => o.status === "Pendente").length;
+        document.getElementById("statAndamento").textContent = listaOS.filter((o) => o.status === "Em andamento").length;
+
+        const faturamentoTotal = listaOS.reduce((acc, curr) => acc + (Number(curr.valor) || 0), 0);
+        document.getElementById("statFaturamento").textContent = formatarMoeda(faturamentoTotal);
+
+        document.getElementById("badgeTotal").textContent = listaOS.length;
+        document.getElementById("badgePendente").textContent = listaOS.filter((o) => o.status === "Pendente").length;
+        document.getElementById("badgeAndamento").textContent = listaOS.filter((o) => o.status === "Em andamento").length;
+        document.getElementById("badgeConcluido").textContent = listaOS.filter((o) => o.status === "Concluído").length;
+
+        const recentes = listaOS.slice(0, 10);
+        const container = document.getElementById("recentList");
+
+        if (!recentes.length) {
+          container.innerHTML = `<div class="px-6 py-10 text-center text-sm text-slate-500">Nenhuma OS cadastrada ainda.</div>`;
+          return;
+        }
+
+        container.innerHTML = recentes.map((o) => {
+          let iconColor = "text-amber-500 bg-amber-50";
+          if (o.status === "Em andamento") iconColor = "text-blue-500 bg-blue-50";
+          if (o.status === "Concluído") iconColor = "text-green-500 bg-green-50";
+          if (o.status === "Cancelado") iconColor = "text-red-500 bg-red-50";
+          const numeroFormatado = o.numero_os || `#${o.id}`;
+
+          return `
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between px-4 lg:px-6 py-4 hover:bg-slate-50 transition cursor-pointer border-b border-slate-100 last:border-0 group" onclick="abrirDetalhes(${o.id})">
+              <div class="flex items-start lg:items-center gap-3 lg:gap-4 min-w-0">
+                <div class="w-11 h-11 lg:w-12 lg:h-12 rounded-xl ${iconColor} flex items-center justify-center flex-shrink-0 border border-white shadow-sm group-hover:scale-105 transition-transform mt-1 lg:mt-0">
+                  <i class="fa-solid fa-clipboard text-base lg:text-lg"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <p class="text-sm lg:text-base font-bold text-slate-800 truncate">${o.nome}</p>
+                    <span class="text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-0.5 rounded-md">${numeroFormatado}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                    <span class="text-[10px] lg:text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 truncate max-w-[160px]">
+                      <i class="fa-solid fa-wrench text-slate-400 mr-1"></i>${o.servico}
+                    </span>
+                    <span class="text-[10px] lg:text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                      <i class="fa-solid fa-hashtag text-slate-400 mr-1"></i>${o.quantidade}
+                    </span>
+                    <span class="text-[10px] lg:text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      ${formatarMoeda(o.valor)}
+                    </span>
+                  </div>
+                  <!-- NOVO CAMPO: OBSERVAÇÃO NO DASHBOARD -->
+                  ${o.observacao ? `
+                    <p class="text-[10px] lg:text-[11px] text-slate-500 mt-1.5 line-clamp-1 italic w-full">
+                      <i class="fa-solid fa-comment-dots mr-1 text-slate-400"></i>${o.observacao}
+                    </p>
+                  ` : ""}
+                </div>
+              </div>
+              <div class="flex items-center gap-3 lg:gap-6 mt-3 lg:mt-0 flex-shrink-0 justify-between pl-14 lg:pl-0">
+                <div class="flex flex-col lg:items-end">
+                  ${badge(o.status)}
+                  <p class="text-[10px] lg:text-[11px] text-slate-400 mt-1 font-medium">
+                    <i class="fa-regular fa-calendar mr-1"></i>${formatarData(o.created_at)}
+                  </p>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 group-hover:border-indigo-200 transition flex-shrink-0">
+                  <i class="fa-solid fa-chevron-right text-xs"></i>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      /* ---------- LISTA OS ---------- */
+      function renderOS() {
+        let osFiltradas = [...listaOS];
+
+        if (estado.filtroStatus !== "all")
+          osFiltradas = osFiltradas.filter((o) => o.status === estado.filtroStatus);
+
+        if (estado.busca) {
+          const q = estado.busca.toLowerCase();
+          osFiltradas = osFiltradas.filter(
+            (o) =>
+              o.nome.toLowerCase().includes(q) ||
+              o.telefone.toLowerCase().includes(q) ||
+              String(o.id).includes(q) ||
+              (o.numero_os && o.numero_os.toLowerCase().includes(q)) ||
+              o.servico.toLowerCase().includes(q) ||
+              String(o.valor).includes(q)
+          );
+        }
+
+        switch (estado.ordenacao) {
+          case "data-desc": osFiltradas.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)); break;
+          case "data-asc": osFiltradas.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)); break;
+          case "nome-asc": osFiltradas.sort((a, b) => a.nome.localeCompare(b.nome)); break;
+          case "nome-desc": osFiltradas.sort((a, b) => b.nome.localeCompare(a.nome)); break;
+        }
+
+        const tbody = document.getElementById("tableBody");
+        const mobileList = document.getElementById("mobileList");
+        const empty = document.getElementById("emptyState");
+        const desktopWrapper = document.getElementById("desktopOSWrapper");
+        const mobileWrapper = document.getElementById("mobileOSWrapper");
+
+        if (!osFiltradas.length) {
+          tbody.innerHTML = "";
+          mobileList.innerHTML = "";
+          empty.classList.remove("hidden");
+          desktopWrapper.style.display = "none";
+          mobileWrapper.style.display = "none";
+          return;
+        }
+        empty.classList.add("hidden");
+        desktopWrapper.style.display = "";
+        mobileWrapper.style.display = "";
+
+        // Tabela desktop
+        tbody.innerHTML = osFiltradas.map((o) => {
+          const numeroFormatado = o.numero_os || `#${o.id}`;
+          return `
+            <tr class="table-row">
+              <td class="px-5 py-3.5"><span class="text-xs font-bold text-indigo-600">${numeroFormatado}</span></td>
+              <td class="px-5 py-3.5">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 flex-shrink-0">
+                    ${o.nome.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()}
+                  </div>
+                  <span class="text-sm font-semibold text-slate-800">${o.nome}</span>
+                </div>
+              </td>
+              <td class="px-5 py-3.5 text-xs text-slate-600">${o.telefone}</td>
+              <td class="px-5 py-3.5 text-xs text-slate-700 font-medium">${o.servico}</td>
+              <td class="px-5 py-3.5 text-xs text-slate-700 font-medium">${o.quantidade}</td>
+              <td class="px-5 py-3.5 text-xs font-bold text-emerald-600">${formatarMoeda(o.valor)}</td>
+              <td class="px-5 py-3.5">${badge(o.status)}</td>
+              <td class="px-5 py-3.5 text-right">
+                <button onclick="abrirDetalhes(${o.id})" class="w-8 h-8 rounded-lg hover:bg-slate-200 text-slate-600 inline-flex items-center justify-center transition" title="Ver / Editar">
+                  <i class="fa-solid fa-pen-to-square text-sm"></i>
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join("");
+
+        // Cards mobile
+        mobileList.innerHTML = osFiltradas.map((o) => {
+          const numeroFormatado = o.numero_os || `#${o.id}`;
+          const initials = o.nome.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
+          return `
+            <div class="bg-white border border-slate-200 rounded-2xl p-4 active:bg-slate-50 transition cursor-pointer" onclick="abrirDetalhes(${o.id})">
+              <div class="flex items-start justify-between gap-3 mb-3">
+                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 flex-shrink-0">
+                    ${initials}
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-sm font-bold text-slate-800 truncate">${o.nome}</p>
+                    <p class="text-[11px] text-slate-500 truncate">${o.telefone}</p>
+                  </div>
+                </div>
+                <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md flex-shrink-0">${numeroFormatado}</span>
+              </div>
+              <div class="grid grid-cols-2 gap-2 mb-3">
+                <div class="bg-slate-50 rounded-lg px-2.5 py-1.5 min-w-0">
+                  <p class="text-[9px] uppercase text-slate-400 font-bold tracking-wider">Serviço</p>
+                  <p class="text-[11px] font-medium text-slate-700 truncate">${o.servico}</p>
+                </div>
+                <div class="bg-slate-50 rounded-lg px-2.5 py-1.5">
+                  <p class="text-[9px] uppercase text-slate-400 font-bold tracking-wider">Quantidade</p>
+                  <p class="text-[11px] font-medium text-slate-700">${o.quantidade} un.</p>
+                </div>
+              </div>
+              <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                ${badge(o.status)}
+                <p class="text-sm font-bold text-emerald-600">${formatarMoeda(o.valor)}</p>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      /* ---------- GALERIA ---------- */
+      function renderGaleria() {
+        const todasFotos = [];
+        listaOS.forEach((o) => {
+          if (o.fotos_urls && Array.isArray(o.fotos_urls)) {
+            o.fotos_urls.forEach((url) => { if (url) todasFotos.push({ os: o, url }); });
+          }
+        });
+
+        document.getElementById("fotosCount").textContent = `${todasFotos.length} fotos`;
+        const grid = document.getElementById("galeriaGrid");
+        const empty = document.getElementById("galeriaEmpty");
+
+        if (!todasFotos.length) {
+          grid.innerHTML = "";
+          empty.classList.remove("hidden");
+          return;
+        }
+        empty.classList.add("hidden");
+
+        grid.innerHTML = todasFotos.map(({ os, url }) => `
+          <div class="relative group cursor-pointer" onclick="abrirLightbox('${url}')">
+            <img src="${url}" alt="Foto ${os.id}" class="photo-thumb">
+            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 rounded-b-[10px] opacity-0 group-hover:opacity-100 transition pointer-events-none">
+              <p class="text-[10px] font-bold text-white truncate">${os.nome}</p>
+              <p class="text-[9px] text-white/70 truncate">${os.numero_os || "#" + os.id}</p>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      /* ---------- MODAL ---------- */
+      function abrirDetalhes(id) {
+        const os = listaOS.find((o) => o.id === id);
+        if (!os) return;
+
+        document.getElementById("modalTitle").textContent = `Editar OS`;
+        document.getElementById("modalSubtitle").textContent = `Criada em ${formatarData(os.created_at)}`;
+
+        const fotosHTML = os.fotos_urls && os.fotos_urls.length
+          ? `<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">${os.fotos_urls.map((url) => `<div onclick="abrirLightbox('${url}')"><img src="${url}" class="photo-thumb"></div>`).join("")}</div>`
+          : `<p class="text-xs text-slate-500 italic bg-slate-50 p-4 rounded-lg text-center">Nenhuma foto cadastrada nesta OS.</p>`;
+
+        document.getElementById("modalBody").innerHTML = `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div>
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Número da OS</label>
+              <input type="text" id="editNumeroOS" value="${os.numero_os || ""}" class="edit-input font-bold text-indigo-600" placeholder="Ex: OS-1024" />
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Status</label>
+              <select id="editStatus" class="edit-input font-semibold">
+                <option value="Pendente" ${os.status === "Pendente" ? "selected" : ""}>Pendente</option>
+                <option value="Em andamento" ${os.status === "Em andamento" ? "selected" : ""}>Em andamento</option>
+                <option value="Concluído" ${os.status === "Concluído" ? "selected" : ""}>Concluído</option>
+                <option value="Cancelado" ${os.status === "Cancelado" ? "selected" : ""}>Cancelado</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div>
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Nome do Cliente</label>
+              <input type="text" id="editNome" value="${os.nome}" class="edit-input" />
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Telefone</label>
+              <input type="text" id="editTelefone" value="${os.telefone}" class="edit-input" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            <div class="sm:col-span-1">
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Serviço</label>
+              <input type="text" id="editServico" value="${os.servico}" class="edit-input" />
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Quantidade</label>
+              <input type="number" id="editQuantidade" value="${os.quantidade}" class="edit-input" />
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Valor (R$)</label>
+              <input type="number" step="0.01" id="editValor" value="${os.valor}" class="edit-input font-bold text-emerald-600" />
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Descrição / Observação</label>
+            <textarea id="editObservacao" class="edit-input h-24 resize-none">${os.observacao || ""}</textarea>
+          </div>
+
+          <div>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Fotos Anexadas</p>
+            ${fotosHTML}
+          </div>
+
+          <div class="pt-4 border-t border-slate-200 flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-2">
+            <button onclick="excluirOS(${os.id})" class="w-full sm:w-auto px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-trash"></i> Excluir
+            </button>
+            <button onclick="salvarEdicoes(${os.id})" class="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-bold transition flex items-center justify-center gap-2 shadow-md">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar Alterações
+            </button>
+          </div>
+        `;
+
+        document.getElementById("modalDetalhes").classList.add("show");
+      }
+
+      function fecharModal() {
+        document.getElementById("modalDetalhes").classList.remove("show");
+      }
+
+      async function salvarEdicoes(id) {
+        const numero_os = document.getElementById("editNumeroOS").value.trim();
+        const status = document.getElementById("editStatus").value;
+        const nome = document.getElementById("editNome").value.trim();
+        const telefone = document.getElementById("editTelefone").value.trim();
+        const servico = document.getElementById("editServico").value.trim();
+        const quantidade = parseInt(document.getElementById("editQuantidade").value) || 1;
+        const valor = parseFloat(document.getElementById("editValor").value) || 0;
+        const observacao = document.getElementById("editObservacao").value.trim();
+
+        if (!nome || !telefone) {
+          toast("Nome e Telefone são obrigatórios.", "error");
+          return;
+        }
+
+        try {
+          const { error } = await supabaseClient
+            .from("ordens_servico")
+            .update({ numero_os, status, nome, telefone, servico, quantidade, valor, observacao })
+            .eq("id", id);
+          if (error) throw error;
+          toast("OS atualizada com sucesso!");
+          fecharModal();
+          carregarDados();
+        } catch (error) {
+          console.error(error);
+          toast("Erro ao salvar as edições.", "error");
+        }
+      }
+
+      async function excluirOS(id) {
+        if (!confirm("Tem certeza que deseja excluir esta OS? As fotos também serão apagadas.")) return;
+        try {
+          const os = listaOS.find((o) => o.id === id);
+          if (os.fotos_urls && os.fotos_urls.length > 0) {
+            const arquivosParaRemover = os.fotos_urls.map((url) => url.split("/").pop().split("?")[0]);
+            await supabaseClient.storage.from("fotos-ordens").remove(arquivosParaRemover);
+          }
+          const { error } = await supabaseClient.from("ordens_servico").delete().eq("id", id);
+          if (error) throw error;
+          toast("OS excluída com sucesso!");
+          fecharModal();
+          carregarDados();
+        } catch (error) {
+          console.error(error);
+          toast("Erro ao excluir a OS.", "error");
+        }
+      }
+
+      /* ---------- NAVEGAÇÃO ---------- */
+      function mudarView(view) {
+        estado.view = view;
+        document.querySelectorAll(".sidebar-link[data-view]").forEach((el) => el.classList.remove("active"));
+        const activeLink = document.querySelector(`.sidebar-link[data-view="${view}"]`);
+        if (activeLink) activeLink.classList.add("active");
+
+        document.getElementById("viewDashboard").classList.add("hidden");
+        document.getElementById("viewOS").classList.add("hidden");
+        document.getElementById("viewFotos").classList.add("hidden");
+
+        if (view === "dashboard") {
+          document.getElementById("viewDashboard").classList.remove("hidden");
+          document.getElementById("pageTitle").textContent = "Dashboard";
+          document.getElementById("pageSubtitle").textContent = "Visão geral das ordens de serviço";
+        } else if (view === "os") {
+          document.getElementById("viewOS").classList.remove("hidden");
+          document.getElementById("pageTitle").textContent = "Todas as OS";
+          document.getElementById("pageSubtitle").textContent = "Gerencie as ordens de serviço";
+        } else if (view === "fotos") {
+          document.getElementById("viewFotos").classList.remove("hidden");
+          document.getElementById("pageTitle").textContent = "Galeria de Fotos";
+          document.getElementById("pageSubtitle").textContent = "Todas as imagens enviadas";
+        }
+
+        fecharSidebar();
+      }
+
+      /* ---------- EVENTOS ---------- */
+      document.querySelectorAll(".sidebar-link[data-view]").forEach((el) => {
+        el.addEventListener("click", () => mudarView(el.dataset.view));
+      });
+
+      document.querySelectorAll(".sidebar-link[data-filter]").forEach((el) => {
+        el.addEventListener("click", () => {
+          estado.filtroStatus = el.dataset.filter;
+          document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+          const match = document.querySelector(`.filter-btn[data-status="${el.dataset.filter}"]`);
+          if (match) match.classList.add("active");
+          mudarView("os");
+          renderOS();
+        });
+      });
+
+      document.querySelectorAll(".filter-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          estado.filtroStatus = btn.dataset.status;
+          renderOS();
+        });
+      });
+
+      document.getElementById("searchInput").addEventListener("input", (e) => {
+        estado.busca = e.target.value;
+        if (estado.view !== "os") mudarView("os");
+        renderOS();
+      });
+
+      document.getElementById("sortSelect").addEventListener("change", (e) => {
+        estado.ordenacao = e.target.value;
+        renderOS();
+      });
+
+      document.getElementById("modalDetalhes").addEventListener("click", (e) => {
+        if (e.target.id === "modalDetalhes") fecharModal();
+      });
+
+      // Fecha sidebar ao redimensionar para desktop
+      window.addEventListener("resize", () => {
+        if (window.innerWidth >= 1024) fecharSidebar();
+      });
+
+      carregarDados();
+    </script>
+  </body>
+</html>
