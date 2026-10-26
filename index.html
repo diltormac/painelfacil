@@ -2,19 +2,42 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
     <title>OS Fácil — Painel de Ordens de Serviço</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <style>
-      * { box-sizing: border-box; }
-      body { font-family: "Inter", sans-serif; }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+      }
 
-      ::-webkit-scrollbar { width: 8px; height: 8px; }
-      ::-webkit-scrollbar-track { background: transparent; }
-      ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
-      ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 8px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
 
       .sidebar-link {
         display: flex;
@@ -28,14 +51,25 @@
         transition: all 0.15s;
         cursor: pointer;
       }
-      .sidebar-link:hover { background: rgba(255, 255, 255, 0.05); color: white; }
+      .sidebar-link:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: white;
+      }
       .sidebar-link.active {
-        background: linear-gradient(90deg, rgba(67, 94, 219, 0.2), rgba(67, 94, 219, 0.05));
+        background: linear-gradient(
+          90deg,
+          rgba(67, 94, 219, 0.2),
+          rgba(67, 94, 219, 0.05)
+        );
         color: white;
         border-left: 3px solid #435edb;
         padding-left: 11px;
       }
-      .sidebar-link i { width: 18px; text-align: center; font-size: 14px; }
+      .sidebar-link i {
+        width: 18px;
+        text-align: center;
+        font-size: 14px;
+      }
 
       .stat-card {
         background: white;
@@ -45,15 +79,22 @@
         transition: all 0.2s;
       }
       @media (min-width: 1024px) {
-        .stat-card { padding: 18px; }
+        .stat-card {
+          padding: 18px;
+        }
       }
       .stat-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 12px 24px -8px rgba(23, 32, 51, 0.12);
       }
 
-      .table-row { transition: background 0.15s; cursor: pointer; }
-      .table-row:hover { background: #f8fafc; }
+      .table-row {
+        transition: background 0.15s;
+        cursor: pointer;
+      }
+      .table-row:hover {
+        background: #f8fafc;
+      }
 
       .badge {
         display: inline-flex;
@@ -65,16 +106,40 @@
         font-weight: 600;
         white-space: nowrap;
       }
-      .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+      .badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+      }
 
-      .badge-pendente { background: #fef3c7; color: #92400e; }
-      .badge-pendente .badge-dot { background: #f59e0b; }
-      .badge-andamento { background: #dbeafe; color: #1e40af; }
-      .badge-andamento .badge-dot { background: #3b82f6; }
-      .badge-concluido { background: #dcfce7; color: #166534; }
-      .badge-concluido .badge-dot { background: #22c55e; }
-      .badge-cancelado { background: #fee2e2; color: #991b1b; }
-      .badge-cancelado .badge-dot { background: #ef4444; }
+      .badge-pendente {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .badge-pendente .badge-dot {
+        background: #f59e0b;
+      }
+      .badge-andamento {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+      .badge-andamento .badge-dot {
+        background: #3b82f6;
+      }
+      .badge-concluido {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .badge-concluido .badge-dot {
+        background: #22c55e;
+      }
+      .badge-cancelado {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .badge-cancelado .badge-dot {
+        background: #ef4444;
+      }
 
       .search-input:focus {
         outline: none;
@@ -98,8 +163,14 @@
         justify-content: center;
         height: 34px; /* Altura fixa para igualar com o select */
       }
-      .filter-btn:hover { background: #f1f5f9; }
-      .filter-btn.active { background: #435edb; color: white; border-color: #435edb; }
+      .filter-btn:hover {
+        background: #f1f5f9;
+      }
+      .filter-btn.active {
+        background: #435edb;
+        color: white;
+        border-color: #435edb;
+      }
 
       .modal-overlay {
         position: fixed;
@@ -116,9 +187,14 @@
         transition: opacity 0.2s;
       }
       @media (min-width: 640px) {
-        .modal-overlay { padding: 24px; }
+        .modal-overlay {
+          padding: 24px;
+        }
       }
-      .modal-overlay.show { opacity: 1; pointer-events: auto; }
+      .modal-overlay.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
       .modal-content {
         background: white;
         border-radius: 18px;
@@ -131,9 +207,13 @@
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
       }
       @media (min-width: 640px) {
-        .modal-content { max-height: 90vh; }
+        .modal-content {
+          max-height: 90vh;
+        }
       }
-      .modal-overlay.show .modal-content { transform: scale(1); }
+      .modal-overlay.show .modal-content {
+        transform: scale(1);
+      }
 
       .photo-thumb {
         width: 100%;
@@ -144,7 +224,9 @@
         cursor: pointer;
         transition: transform 0.15s;
       }
-      .photo-thumb:hover { transform: scale(1.03); }
+      .photo-thumb:hover {
+        transform: scale(1.03);
+      }
 
       .toast {
         position: fixed;
@@ -164,11 +246,23 @@
         text-align: center;
       }
       @media (min-width: 640px) {
-        .toast { left: auto; right: 24px; bottom: 24px; text-align: left; }
+        .toast {
+          left: auto;
+          right: 24px;
+          bottom: 24px;
+          text-align: left;
+        }
       }
-      .toast.show { transform: translateY(0); opacity: 1; }
-      .toast-success { background: #16a34a; }
-      .toast-error { background: #dc2626; }
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .toast-success {
+        background: #16a34a;
+      }
+      .toast-error {
+        background: #dc2626;
+      }
 
       .lightbox {
         position: fixed;
@@ -183,7 +277,10 @@
         transition: opacity 0.3s;
         padding: 20px;
       }
-      .lightbox.show { opacity: 1; pointer-events: auto; }
+      .lightbox.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
       .lightbox img {
         max-width: 100%;
         max-height: 90vh;
@@ -192,7 +289,9 @@
         transform: scale(0.95);
         transition: transform 0.3s;
       }
-      .lightbox.show img { transform: scale(1); }
+      .lightbox.show img {
+        transform: scale(1);
+      }
       .lightbox-close {
         position: absolute;
         top: 16px;
@@ -210,7 +309,9 @@
         font-size: 20px;
         border: none;
       }
-      .lightbox-close:hover { background: rgba(255, 255, 255, 0.2); }
+      .lightbox-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
 
       .edit-input {
         width: 100%;
@@ -227,10 +328,34 @@
         border-color: #435edb;
         box-shadow: 0 0 0 2px rgba(67, 94, 219, 0.1);
       }
+
+      /* Botão de copiar */
+      .copy-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-size: 10px;
+        flex-shrink: 0;
+      }
+      .copy-btn:hover {
+        background: #435edb;
+        color: white;
+        border-color: #435edb;
+      }
+      .copy-btn:active {
+        transform: scale(0.92);
+      }
     </style>
   </head>
   <body class="bg-slate-100 h-screen overflow-hidden flex">
-
     <!-- ============ OVERLAY (mobile) ============ -->
     <div
       id="sidebarOverlay"
@@ -244,12 +369,16 @@
       class="fixed lg:static inset-y-0 left-0 z-40 w-64 bg-slate-900 text-white flex flex-col flex-shrink-0 border-r border-slate-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-out"
     >
       <div class="px-5 py-5 border-b border-slate-800 flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-lg shadow-indigo-900/40 flex-shrink-0">
+        <div
+          class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-lg shadow-indigo-900/40 flex-shrink-0"
+        >
           <i class="fa-solid fa-clipboard-list text-lg"></i>
         </div>
         <div class="min-w-0">
           <p class="font-extrabold text-base leading-none">OS Fácil</p>
-          <p class="text-[10px] text-slate-400 mt-1 tracking-wider uppercase">Painel Admin</p>
+          <p class="text-[10px] text-slate-400 mt-1 tracking-wider uppercase">
+            Painel Admin
+          </p>
         </div>
         <button
           onclick="fecharSidebar()"
@@ -260,40 +389,70 @@
       </div>
 
       <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        <p class="text-[10px] text-slate-500 font-bold uppercase px-3 mb-2 tracking-wider">Principal</p>
+        <p
+          class="text-[10px] text-slate-500 font-bold uppercase px-3 mb-2 tracking-wider"
+        >
+          Principal
+        </p>
         <a class="sidebar-link active" data-view="dashboard">
           <i class="fa-solid fa-chart-pie"></i>Dashboard
         </a>
         <a class="sidebar-link" data-view="os">
           <i class="fa-solid fa-clipboard-list"></i>Todas as OS
-          <span id="badgeTotal" class="ml-auto bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+          <span
+            id="badgeTotal"
+            class="ml-auto bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"
+            >0</span
+          >
         </a>
         <a class="sidebar-link" data-view="fotos">
           <i class="fa-solid fa-images"></i>Galeria de Fotos
         </a>
 
-        <p class="text-[10px] text-slate-500 font-bold uppercase px-3 mt-5 mb-2 tracking-wider">Filtros rápidos</p>
+        <p
+          class="text-[10px] text-slate-500 font-bold uppercase px-3 mt-5 mb-2 tracking-wider"
+        >
+          Filtros rápidos
+        </p>
         <a class="sidebar-link" data-filter="Pendente">
           <i class="fa-solid fa-clock text-amber-400"></i>Pendentes
-          <span id="badgePendente" class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300">0</span>
+          <span
+            id="badgePendente"
+            class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300"
+            >0</span
+          >
         </a>
         <a class="sidebar-link" data-filter="Em andamento">
           <i class="fa-solid fa-spinner text-blue-400"></i>Em andamento
-          <span id="badgeAndamento" class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300">0</span>
+          <span
+            id="badgeAndamento"
+            class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300"
+            >0</span
+          >
         </a>
         <a class="sidebar-link" data-filter="Concluído">
           <i class="fa-solid fa-circle-check text-green-400"></i>Concluídos
-          <span id="badgeConcluido" class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-500/20 text-green-300">0</span>
+          <span
+            id="badgeConcluido"
+            class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-500/20 text-green-300"
+            >0</span
+          >
         </a>
       </nav>
 
       <div class="px-4 py-4 border-t border-slate-800 flex items-center gap-3">
-        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">AD</div>
+        <div
+          class="w-9 h-9 rounded-full bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
+        >
+          AD
+        </div>
         <div class="min-w-0">
           <p class="text-sm font-semibold truncate">Admin</p>
           <p class="text-[10px] text-slate-400 truncate">admin@osfacil.com</p>
         </div>
-        <button class="ml-auto text-slate-400 hover:text-white transition flex-shrink-0">
+        <button
+          class="ml-auto text-slate-400 hover:text-white transition flex-shrink-0"
+        >
           <i class="fa-solid fa-right-from-bracket text-sm"></i>
         </button>
       </div>
@@ -302,7 +461,9 @@
     <!-- ================= MAIN ================= -->
     <div class="flex-1 flex flex-col overflow-hidden min-w-0">
       <header class="bg-white border-b border-slate-200 flex-shrink-0">
-        <div class="px-3 md:px-6 py-3 flex items-center gap-2 md:gap-3 flex-wrap">
+        <div
+          class="px-3 md:px-6 py-3 flex items-center gap-2 md:gap-3 flex-wrap"
+        >
           <button
             id="mobileMenuBtn"
             onclick="abrirSidebar()"
@@ -312,8 +473,16 @@
           </button>
 
           <div class="min-w-0">
-            <h1 id="pageTitle" class="text-base md:text-lg font-bold text-slate-800 truncate">Dashboard</h1>
-            <p id="pageSubtitle" class="text-[10px] md:text-xs text-slate-500 truncate hidden sm:block">
+            <h1
+              id="pageTitle"
+              class="text-base md:text-lg font-bold text-slate-800 truncate"
+            >
+              Dashboard
+            </h1>
+            <p
+              id="pageSubtitle"
+              class="text-[10px] md:text-xs text-slate-500 truncate hidden sm:block"
+            >
               Visão geral das ordens de serviço
             </p>
           </div>
@@ -326,8 +495,12 @@
             <i class="fa-solid fa-rotate-right text-sm"></i>
           </button>
 
-          <div class="relative order-last w-full md:order-none md:w-64 lg:w-72 md:ml-auto">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <div
+            class="relative order-last w-full md:order-none md:w-64 lg:w-72 md:ml-auto"
+          >
+            <i
+              class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"
+            ></i>
             <input
               id="searchInput"
               type="text"
@@ -344,53 +517,115 @@
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
             <div class="stat-card">
               <div class="flex items-start justify-between mb-2 lg:mb-3">
-                <div class="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-                  <i class="fa-solid fa-clipboard-list text-indigo-600 text-sm lg:text-base"></i>
+                <div
+                  class="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-indigo-50 flex items-center justify-center"
+                >
+                  <i
+                    class="fa-solid fa-clipboard-list text-indigo-600 text-sm lg:text-base"
+                  ></i>
                 </div>
-                <span class="text-[9px] lg:text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                <span
+                  class="text-[9px] lg:text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full"
+                >
                   <i class="fa-solid fa-arrow-up mr-1"></i>Total
                 </span>
               </div>
-              <p class="text-xl lg:text-2xl font-extrabold text-slate-800" id="statTotal">0</p>
-              <p class="text-[10px] lg:text-xs text-slate-500 mt-1 leading-tight">Ordens cadastradas</p>
+              <p
+                class="text-xl lg:text-2xl font-extrabold text-slate-800"
+                id="statTotal"
+              >
+                0
+              </p>
+              <p
+                class="text-[10px] lg:text-xs text-slate-500 mt-1 leading-tight"
+              >
+                Ordens cadastradas
+              </p>
             </div>
 
             <div class="stat-card">
               <div class="flex items-start justify-between mb-2 lg:mb-3">
-                <div class="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-amber-50 flex items-center justify-center">
-                  <i class="fa-solid fa-clock text-amber-600 text-sm lg:text-base"></i>
+                <div
+                  class="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-amber-50 flex items-center justify-center"
+                >
+                  <i
+                    class="fa-solid fa-clock text-amber-600 text-sm lg:text-base"
+                  ></i>
                 </div>
               </div>
-              <p class="text-xl lg:text-2xl font-extrabold text-slate-800" id="statPendente">0</p>
-              <p class="text-[10px] lg:text-xs text-slate-500 mt-1 leading-tight">Pendentes</p>
+              <p
+                class="text-xl lg:text-2xl font-extrabold text-slate-800"
+                id="statPendente"
+              >
+                0
+              </p>
+              <p
+                class="text-[10px] lg:text-xs text-slate-500 mt-1 leading-tight"
+              >
+                Pendentes
+              </p>
             </div>
 
             <div class="stat-card">
               <div class="flex items-start justify-between mb-2 lg:mb-3">
-                <div class="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                  <i class="fa-solid fa-spinner text-blue-600 text-sm lg:text-base"></i>
+                <div
+                  class="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-blue-50 flex items-center justify-center"
+                >
+                  <i
+                    class="fa-solid fa-spinner text-blue-600 text-sm lg:text-base"
+                  ></i>
                 </div>
               </div>
-              <p class="text-xl lg:text-2xl font-extrabold text-slate-800" id="statAndamento">0</p>
-              <p class="text-[10px] lg:text-xs text-slate-500 mt-1 leading-tight">Em andamento</p>
+              <p
+                class="text-xl lg:text-2xl font-extrabold text-slate-800"
+                id="statAndamento"
+              >
+                0
+              </p>
+              <p
+                class="text-[10px] lg:text-xs text-slate-500 mt-1 leading-tight"
+              >
+                Em andamento
+              </p>
             </div>
 
             <div class="stat-card">
               <div class="flex items-start justify-between mb-2 lg:mb-3">
-                <div class="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                  <i class="fa-solid fa-dollar-sign text-emerald-600 text-sm lg:text-base"></i>
+                <div
+                  class="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-emerald-50 flex items-center justify-center"
+                >
+                  <i
+                    class="fa-solid fa-dollar-sign text-emerald-600 text-sm lg:text-base"
+                  ></i>
                 </div>
               </div>
-              <p class="text-sm lg:text-xl font-extrabold text-slate-800 whitespace-nowrap overflow-hidden text-ellipsis" id="statFaturamento">R$ 0,00</p>
-              <p class="text-[10px] lg:text-xs text-slate-500 mt-1 leading-tight">Faturamento total</p>
+              <p
+                class="text-sm lg:text-xl font-extrabold text-slate-800 whitespace-nowrap overflow-hidden text-ellipsis"
+                id="statFaturamento"
+              >
+                R$ 0,00
+              </p>
+              <p
+                class="text-[10px] lg:text-xs text-slate-500 mt-1 leading-tight"
+              >
+                Faturamento total
+              </p>
             </div>
           </div>
 
-          <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-            <div class="px-4 lg:px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50 gap-3">
+          <div
+            class="bg-white border border-slate-200 rounded-2xl overflow-hidden"
+          >
+            <div
+              class="px-4 lg:px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50 gap-3"
+            >
               <div class="min-w-0">
-                <h2 class="font-bold text-slate-800 text-sm lg:text-base">Últimas ordens de serviço</h2>
-                <p class="text-[10px] lg:text-xs text-slate-500 mt-0.5">As 10 mais recentes do banco</p>
+                <h2 class="font-bold text-slate-800 text-sm lg:text-base">
+                  Últimas ordens de serviço
+                </h2>
+                <p class="text-[10px] lg:text-xs text-slate-500 mt-0.5">
+                  As 10 mais recentes do banco
+                </p>
               </div>
               <button
                 class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 flex-shrink-0"
@@ -405,14 +640,26 @@
 
         <!-- ============ OS VIEW ============ -->
         <div id="viewOS" class="hidden space-y-3 lg:space-y-4">
-          <!-- Ajuste de alinhamento aqui -->
           <div class="flex items-center gap-2">
             <div class="flex gap-2 overflow-x-auto lg:pb-0 pb-1 flex-1 min-w-0">
-              <button class="filter-btn active flex-shrink-0" data-status="all">Todas</button>
-              <button class="filter-btn flex-shrink-0" data-status="Pendente">Pendentes</button>
-              <button class="filter-btn flex-shrink-0" data-status="Em andamento">Em andamento</button>
-              <button class="filter-btn flex-shrink-0" data-status="Concluído">Concluídas</button>
-              <button class="filter-btn flex-shrink-0" data-status="Cancelado">Canceladas</button>
+              <button class="filter-btn active flex-shrink-0" data-status="all">
+                Todas
+              </button>
+              <button class="filter-btn flex-shrink-0" data-status="Pendente">
+                Pendentes
+              </button>
+              <button
+                class="filter-btn flex-shrink-0"
+                data-status="Em andamento"
+              >
+                Em andamento
+              </button>
+              <button class="filter-btn flex-shrink-0" data-status="Concluído">
+                Concluídas
+              </button>
+              <button class="filter-btn flex-shrink-0" data-status="Cancelado">
+                Canceladas
+              </button>
             </div>
             <select
               id="sortSelect"
@@ -425,58 +672,115 @@
             </select>
           </div>
 
-          <!-- Tabela (desktop) -->
-          <div id="desktopOSWrapper" class="hidden lg:block bg-white border border-slate-200 rounded-2xl overflow-hidden">
+          <div
+            id="desktopOSWrapper"
+            class="hidden lg:block bg-white border border-slate-200 rounded-2xl overflow-hidden"
+          >
             <table class="w-full">
               <thead class="bg-slate-50 border-b border-slate-200">
                 <tr>
-                  <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">Nº OS</th>
-                  <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">Cliente</th>
-                  <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">Telefone</th>
-                  <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">Serviço</th>
-                  <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">Qtd</th>
-                  <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">Valor</th>
-                  <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">Status</th>
-                  <th class="text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">Ações</th>
+                  <th
+                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3"
+                  >
+                    Nº OS
+                  </th>
+                  <th
+                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3"
+                  >
+                    Cliente
+                  </th>
+                  <th
+                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3"
+                  >
+                    Telefone
+                  </th>
+                  <th
+                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3"
+                  >
+                    Serviço
+                  </th>
+                  <th
+                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3"
+                  >
+                    Qtd
+                  </th>
+                  <th
+                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3"
+                  >
+                    Valor
+                  </th>
+                  <th
+                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3"
+                  >
+                    Status
+                  </th>
+                  <th
+                    class="text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3"
+                  >
+                    Ações
+                  </th>
                 </tr>
               </thead>
               <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
             </table>
           </div>
 
-          <!-- Cards (mobile / tablet) -->
           <div id="mobileOSWrapper" class="lg:hidden space-y-3">
             <div id="mobileList" class="space-y-3"></div>
           </div>
 
-          <!-- Estado vazio (compartilhado) -->
-          <div id="emptyState" class="hidden bg-white border border-slate-200 rounded-2xl px-5 py-16 text-center">
-            <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
+          <div
+            id="emptyState"
+            class="hidden bg-white border border-slate-200 rounded-2xl px-5 py-16 text-center"
+          >
+            <div
+              class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3"
+            >
               <i class="fa-solid fa-inbox text-2xl text-slate-400"></i>
             </div>
-            <p class="text-sm font-semibold text-slate-700">Nenhuma OS encontrada</p>
-            <p class="text-xs text-slate-500 mt-1">Tente ajustar os filtros ou a busca.</p>
+            <p class="text-sm font-semibold text-slate-700">
+              Nenhuma OS encontrada
+            </p>
+            <p class="text-xs text-slate-500 mt-1">
+              Tente ajustar os filtros ou a busca.
+            </p>
           </div>
         </div>
 
         <!-- ============ FOTOS VIEW ============ -->
         <div id="viewFotos" class="hidden">
-          <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 lg:p-6">
+          <div
+            class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 lg:p-6"
+          >
             <div class="flex items-center justify-between mb-4 lg:mb-5 gap-3">
               <div class="min-w-0">
-                <h2 class="font-bold text-slate-800 text-sm lg:text-base">Galeria de fotos</h2>
-                <p class="text-[10px] lg:text-xs text-slate-500 mt-0.5">Todas as fotos enviadas nas OS</p>
+                <h2 class="font-bold text-slate-800 text-sm lg:text-base">
+                  Galeria de fotos
+                </h2>
+                <p class="text-[10px] lg:text-xs text-slate-500 mt-0.5">
+                  Todas as fotos enviadas nas OS
+                </p>
               </div>
-              <span id="fotosCount" class="text-[10px] lg:text-xs font-bold text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-full whitespace-nowrap">
+              <span
+                id="fotosCount"
+                class="text-[10px] lg:text-xs font-bold text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-full whitespace-nowrap"
+              >
                 0 fotos
               </span>
             </div>
-            <div id="galeriaGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 lg:gap-3"></div>
+            <div
+              id="galeriaGrid"
+              class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 lg:gap-3"
+            ></div>
             <div id="galeriaEmpty" class="hidden py-16 text-center">
-              <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
+              <div
+                class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3"
+              >
                 <i class="fa-solid fa-images text-2xl text-slate-400"></i>
               </div>
-              <p class="text-sm font-semibold text-slate-700">Nenhuma foto cadastrada</p>
+              <p class="text-sm font-semibold text-slate-700">
+                Nenhuma foto cadastrada
+              </p>
             </div>
           </div>
         </div>
@@ -486,12 +790,25 @@
     <!-- ================= MODAL ================= -->
     <div id="modalDetalhes" class="modal-overlay">
       <div class="modal-content">
-        <div class="sticky top-0 bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between rounded-t-[18px] z-10">
+        <div
+          class="sticky top-0 bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between rounded-t-[18px] z-10"
+        >
           <div class="min-w-0">
-            <h2 class="font-bold text-slate-800 text-sm sm:text-base" id="modalTitle">Editar OS</h2>
-            <p class="text-[10px] sm:text-xs text-slate-500 mt-0.5 truncate" id="modalSubtitle"></p>
+            <h2
+              class="font-bold text-slate-800 text-sm sm:text-base"
+              id="modalTitle"
+            >
+              Editar OS
+            </h2>
+            <p
+              class="text-[10px] sm:text-xs text-slate-500 mt-0.5 truncate"
+              id="modalSubtitle"
+            ></p>
           </div>
-          <button onclick="fecharModal()" class="w-9 h-9 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 transition flex-shrink-0">
+          <button
+            onclick="fecharModal()"
+            class="w-9 h-9 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 transition flex-shrink-0"
+          >
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -504,7 +821,12 @@
       <button class="lightbox-close" onclick="fecharLightbox(event)">
         <i class="fa-solid fa-xmark"></i>
       </button>
-      <img id="lightboxImg" src="" alt="Visualização da foto" onclick="event.stopPropagation()" />
+      <img
+        id="lightboxImg"
+        src=""
+        alt="Visualização da foto"
+        onclick="event.stopPropagation()"
+      />
     </div>
 
     <div id="toast" class="toast"></div>
@@ -549,8 +871,12 @@
       }
 
       function formatarMoeda(valor) {
-        if (valor === null || valor === undefined || isNaN(valor)) return "R$ 0,00";
-        return Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+        if (valor === null || valor === undefined || isNaN(valor))
+          return "R$ 0,00";
+        return Number(valor).toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        });
       }
 
       function toast(msg, tipo = "success") {
@@ -560,9 +886,46 @@
         setTimeout(() => el.classList.remove("show"), 3000);
       }
 
+      /* ---------- COPIAR TEXTO ---------- */
+      async function copiarTexto(texto, botao) {
+        if (!texto || !texto.trim()) {
+          toast("Nada para copiar.", "error");
+          return;
+        }
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(texto);
+          } else {
+            const ta = document.createElement("textarea");
+            ta.value = texto;
+            ta.style.position = "fixed";
+            ta.style.opacity = "0";
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+          }
+          toast("Copiado!");
+          if (botao) {
+            const icon = botao.querySelector("i");
+            if (icon) {
+              icon.className = "fa-solid fa-check";
+              setTimeout(() => {
+                icon.className = "fa-solid fa-copy";
+              }, 1500);
+            }
+          }
+        } catch (err) {
+          console.error(err);
+          toast("Erro ao copiar.", "error");
+        }
+      }
+
       /* ---------- SIDEBAR MOBILE ---------- */
       function abrirSidebar() {
-        document.getElementById("sidebar").classList.remove("-translate-x-full");
+        document
+          .getElementById("sidebar")
+          .classList.remove("-translate-x-full");
         document.getElementById("sidebarOverlay").classList.remove("hidden");
       }
       function fecharSidebar() {
@@ -579,10 +942,15 @@
         box.classList.add("show");
       }
       function fecharLightbox(event) {
-        if (event.target.id === "lightbox" || event.target.closest(".lightbox-close")) {
+        if (
+          event.target.id === "lightbox" ||
+          event.target.closest(".lightbox-close")
+        ) {
           const box = document.getElementById("lightbox");
           box.classList.remove("show");
-          setTimeout(() => { document.getElementById("lightboxImg").src = ""; }, 300);
+          setTimeout(() => {
+            document.getElementById("lightboxImg").src = "";
+          }, 300);
         }
       }
 
@@ -594,7 +962,10 @@
             .select("*")
             .order("created_at", { ascending: false });
           if (error) throw error;
-          listaOS = data.map((item) => ({ ...item, status: item.status || "Pendente" }));
+          listaOS = data.map((item) => ({
+            ...item,
+            status: item.status || "Pendente",
+          }));
           atualizarTudo();
         } catch (error) {
           console.error(error);
@@ -611,16 +982,30 @@
       /* ---------- DASHBOARD ---------- */
       function renderDashboard() {
         document.getElementById("statTotal").textContent = listaOS.length;
-        document.getElementById("statPendente").textContent = listaOS.filter((o) => o.status === "Pendente").length;
-        document.getElementById("statAndamento").textContent = listaOS.filter((o) => o.status === "Em andamento").length;
+        document.getElementById("statPendente").textContent = listaOS.filter(
+          (o) => o.status === "Pendente",
+        ).length;
+        document.getElementById("statAndamento").textContent = listaOS.filter(
+          (o) => o.status === "Em andamento",
+        ).length;
 
-        const faturamentoTotal = listaOS.reduce((acc, curr) => acc + (Number(curr.valor) || 0), 0);
-        document.getElementById("statFaturamento").textContent = formatarMoeda(faturamentoTotal);
+        const faturamentoTotal = listaOS.reduce(
+          (acc, curr) => acc + (Number(curr.valor) || 0),
+          0,
+        );
+        document.getElementById("statFaturamento").textContent =
+          formatarMoeda(faturamentoTotal);
 
         document.getElementById("badgeTotal").textContent = listaOS.length;
-        document.getElementById("badgePendente").textContent = listaOS.filter((o) => o.status === "Pendente").length;
-        document.getElementById("badgeAndamento").textContent = listaOS.filter((o) => o.status === "Em andamento").length;
-        document.getElementById("badgeConcluido").textContent = listaOS.filter((o) => o.status === "Concluído").length;
+        document.getElementById("badgePendente").textContent = listaOS.filter(
+          (o) => o.status === "Pendente",
+        ).length;
+        document.getElementById("badgeAndamento").textContent = listaOS.filter(
+          (o) => o.status === "Em andamento",
+        ).length;
+        document.getElementById("badgeConcluido").textContent = listaOS.filter(
+          (o) => o.status === "Concluído",
+        ).length;
 
         const recentes = listaOS.slice(0, 10);
         const container = document.getElementById("recentList");
@@ -630,14 +1015,17 @@
           return;
         }
 
-        container.innerHTML = recentes.map((o) => {
-          let iconColor = "text-amber-500 bg-amber-50";
-          if (o.status === "Em andamento") iconColor = "text-blue-500 bg-blue-50";
-          if (o.status === "Concluído") iconColor = "text-green-500 bg-green-50";
-          if (o.status === "Cancelado") iconColor = "text-red-500 bg-red-50";
-          const numeroFormatado = o.numero_os || `#${o.id}`;
+        container.innerHTML = recentes
+          .map((o) => {
+            let iconColor = "text-amber-500 bg-amber-50";
+            if (o.status === "Em andamento")
+              iconColor = "text-blue-500 bg-blue-50";
+            if (o.status === "Concluído")
+              iconColor = "text-green-500 bg-green-50";
+            if (o.status === "Cancelado") iconColor = "text-red-500 bg-red-50";
+            const numeroFormatado = o.numero_os || `#${o.id}`;
 
-          return `
+            return `
             <div class="flex flex-col lg:flex-row lg:items-center justify-between px-4 lg:px-6 py-4 hover:bg-slate-50 transition cursor-pointer border-b border-slate-100 last:border-0 group" onclick="abrirDetalhes(${o.id})">
               <div class="flex items-start lg:items-center gap-3 lg:gap-4 min-w-0">
                 <div class="w-11 h-11 lg:w-12 lg:h-12 rounded-xl ${iconColor} flex items-center justify-center flex-shrink-0 border border-white shadow-sm group-hover:scale-105 transition-transform mt-1 lg:mt-0">
@@ -659,12 +1047,15 @@
                       ${formatarMoeda(o.valor)}
                     </span>
                   </div>
-                  <!-- NOVO CAMPO: OBSERVAÇÃO NO DASHBOARD -->
-                  ${o.observacao ? `
+                  ${
+                    o.observacao
+                      ? `
                     <p class="text-[10px] lg:text-[11px] text-slate-500 mt-1.5 line-clamp-1 italic w-full">
                       <i class="fa-solid fa-comment-dots mr-1 text-slate-400"></i>${o.observacao}
                     </p>
-                  ` : ""}
+                  `
+                      : ""
+                  }
                 </div>
               </div>
               <div class="flex items-center gap-3 lg:gap-6 mt-3 lg:mt-0 flex-shrink-0 justify-between pl-14 lg:pl-0">
@@ -680,7 +1071,8 @@
               </div>
             </div>
           `;
-        }).join("");
+          })
+          .join("");
       }
 
       /* ---------- LISTA OS ---------- */
@@ -688,7 +1080,9 @@
         let osFiltradas = [...listaOS];
 
         if (estado.filtroStatus !== "all")
-          osFiltradas = osFiltradas.filter((o) => o.status === estado.filtroStatus);
+          osFiltradas = osFiltradas.filter(
+            (o) => o.status === estado.filtroStatus,
+          );
 
         if (estado.busca) {
           const q = estado.busca.toLowerCase();
@@ -699,15 +1093,27 @@
               String(o.id).includes(q) ||
               (o.numero_os && o.numero_os.toLowerCase().includes(q)) ||
               o.servico.toLowerCase().includes(q) ||
-              String(o.valor).includes(q)
+              String(o.valor).includes(q),
           );
         }
 
         switch (estado.ordenacao) {
-          case "data-desc": osFiltradas.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)); break;
-          case "data-asc": osFiltradas.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)); break;
-          case "nome-asc": osFiltradas.sort((a, b) => a.nome.localeCompare(b.nome)); break;
-          case "nome-desc": osFiltradas.sort((a, b) => b.nome.localeCompare(a.nome)); break;
+          case "data-desc":
+            osFiltradas.sort(
+              (a, b) => new Date(b.created_at) - new Date(a.created_at),
+            );
+            break;
+          case "data-asc":
+            osFiltradas.sort(
+              (a, b) => new Date(a.created_at) - new Date(b.created_at),
+            );
+            break;
+          case "nome-asc":
+            osFiltradas.sort((a, b) => a.nome.localeCompare(b.nome));
+            break;
+          case "nome-desc":
+            osFiltradas.sort((a, b) => b.nome.localeCompare(a.nome));
+            break;
         }
 
         const tbody = document.getElementById("tableBody");
@@ -728,16 +1134,21 @@
         desktopWrapper.style.display = "";
         mobileWrapper.style.display = "";
 
-        // Tabela desktop
-        tbody.innerHTML = osFiltradas.map((o) => {
-          const numeroFormatado = o.numero_os || `#${o.id}`;
-          return `
+        tbody.innerHTML = osFiltradas
+          .map((o) => {
+            const numeroFormatado = o.numero_os || `#${o.id}`;
+            return `
             <tr class="table-row">
               <td class="px-5 py-3.5"><span class="text-xs font-bold text-indigo-600">${numeroFormatado}</span></td>
               <td class="px-5 py-3.5">
                 <div class="flex items-center gap-2.5">
                   <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 flex-shrink-0">
-                    ${o.nome.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()}
+                    ${o.nome
+                      .split(" ")
+                      .map((n) => n[0])
+                      .slice(0, 2)
+                      .join("")
+                      .toUpperCase()}
                   </div>
                   <span class="text-sm font-semibold text-slate-800">${o.nome}</span>
                 </div>
@@ -754,13 +1165,19 @@
               </td>
             </tr>
           `;
-        }).join("");
+          })
+          .join("");
 
-        // Cards mobile
-        mobileList.innerHTML = osFiltradas.map((o) => {
-          const numeroFormatado = o.numero_os || `#${o.id}`;
-          const initials = o.nome.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
-          return `
+        mobileList.innerHTML = osFiltradas
+          .map((o) => {
+            const numeroFormatado = o.numero_os || `#${o.id}`;
+            const initials = o.nome
+              .split(" ")
+              .map((n) => n[0])
+              .slice(0, 2)
+              .join("")
+              .toUpperCase();
+            return `
             <div class="bg-white border border-slate-200 rounded-2xl p-4 active:bg-slate-50 transition cursor-pointer" onclick="abrirDetalhes(${o.id})">
               <div class="flex items-start justify-between gap-3 mb-3">
                 <div class="flex items-center gap-2.5 min-w-0 flex-1">
@@ -790,7 +1207,8 @@
               </div>
             </div>
           `;
-        }).join("");
+          })
+          .join("");
       }
 
       /* ---------- GALERIA ---------- */
@@ -798,11 +1216,14 @@
         const todasFotos = [];
         listaOS.forEach((o) => {
           if (o.fotos_urls && Array.isArray(o.fotos_urls)) {
-            o.fotos_urls.forEach((url) => { if (url) todasFotos.push({ os: o, url }); });
+            o.fotos_urls.forEach((url) => {
+              if (url) todasFotos.push({ os: o, url });
+            });
           }
         });
 
-        document.getElementById("fotosCount").textContent = `${todasFotos.length} fotos`;
+        document.getElementById("fotosCount").textContent =
+          `${todasFotos.length} fotos`;
         const grid = document.getElementById("galeriaGrid");
         const empty = document.getElementById("galeriaEmpty");
 
@@ -813,7 +1234,9 @@
         }
         empty.classList.add("hidden");
 
-        grid.innerHTML = todasFotos.map(({ os, url }) => `
+        grid.innerHTML = todasFotos
+          .map(
+            ({ os, url }) => `
           <div class="relative group cursor-pointer" onclick="abrirLightbox('${url}')">
             <img src="${url}" alt="Foto ${os.id}" class="photo-thumb">
             <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 rounded-b-[10px] opacity-0 group-hover:opacity-100 transition pointer-events-none">
@@ -821,7 +1244,9 @@
               <p class="text-[9px] text-white/70 truncate">${os.numero_os || "#" + os.id}</p>
             </div>
           </div>
-        `).join("");
+        `,
+          )
+          .join("");
       }
 
       /* ---------- MODAL ---------- */
@@ -830,11 +1255,13 @@
         if (!os) return;
 
         document.getElementById("modalTitle").textContent = `Editar OS`;
-        document.getElementById("modalSubtitle").textContent = `Criada em ${formatarData(os.created_at)}`;
+        document.getElementById("modalSubtitle").textContent =
+          `Criada em ${formatarData(os.created_at)}`;
 
-        const fotosHTML = os.fotos_urls && os.fotos_urls.length
-          ? `<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">${os.fotos_urls.map((url) => `<div onclick="abrirLightbox('${url}')"><img src="${url}" class="photo-thumb"></div>`).join("")}</div>`
-          : `<p class="text-xs text-slate-500 italic bg-slate-50 p-4 rounded-lg text-center">Nenhuma foto cadastrada nesta OS.</p>`;
+        const fotosHTML =
+          os.fotos_urls && os.fotos_urls.length
+            ? `<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">${os.fotos_urls.map((url) => `<div onclick="abrirLightbox('${url}')"><img src="${url}" class="photo-thumb"></div>`).join("")}</div>`
+            : `<p class="text-xs text-slate-500 italic bg-slate-50 p-4 rounded-lg text-center">Nenhuma foto cadastrada nesta OS.</p>`;
 
         document.getElementById("modalBody").innerHTML = `
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -855,18 +1282,33 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Nome do Cliente</label>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Nome do Cliente</label>
+                <button class="copy-btn" onclick="copiarTexto(document.getElementById('editNome').value, this)" title="Copiar nome">
+                  <i class="fa-solid fa-copy"></i>
+                </button>
+              </div>
               <input type="text" id="editNome" value="${os.nome}" class="edit-input" />
             </div>
             <div>
-              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Telefone</label>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Telefone</label>
+                <button class="copy-btn" onclick="copiarTexto(document.getElementById('editTelefone').value, this)" title="Copiar telefone">
+                  <i class="fa-solid fa-copy"></i>
+                </button>
+              </div>
               <input type="text" id="editTelefone" value="${os.telefone}" class="edit-input" />
             </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             <div class="sm:col-span-1">
-              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Serviço</label>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Serviço</label>
+                <button class="copy-btn" onclick="copiarTexto(document.getElementById('editServico').value, this)" title="Copiar serviço">
+                  <i class="fa-solid fa-copy"></i>
+                </button>
+              </div>
               <input type="text" id="editServico" value="${os.servico}" class="edit-input" />
             </div>
             <div>
@@ -880,7 +1322,12 @@
           </div>
 
           <div>
-            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Descrição / Observação</label>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Descrição / Observação</label>
+              <button class="copy-btn" onclick="copiarTexto(document.getElementById('editObservacao').value, this)" title="Copiar observação">
+                <i class="fa-solid fa-copy"></i>
+              </button>
+            </div>
             <textarea id="editObservacao" class="edit-input h-24 resize-none">${os.observacao || ""}</textarea>
           </div>
 
@@ -912,9 +1359,13 @@
         const nome = document.getElementById("editNome").value.trim();
         const telefone = document.getElementById("editTelefone").value.trim();
         const servico = document.getElementById("editServico").value.trim();
-        const quantidade = parseInt(document.getElementById("editQuantidade").value) || 1;
-        const valor = parseFloat(document.getElementById("editValor").value) || 0;
-        const observacao = document.getElementById("editObservacao").value.trim();
+        const quantidade =
+          parseInt(document.getElementById("editQuantidade").value) || 1;
+        const valor =
+          parseFloat(document.getElementById("editValor").value) || 0;
+        const observacao = document
+          .getElementById("editObservacao")
+          .value.trim();
 
         if (!nome || !telefone) {
           toast("Nome e Telefone são obrigatórios.", "error");
@@ -924,7 +1375,16 @@
         try {
           const { error } = await supabaseClient
             .from("ordens_servico")
-            .update({ numero_os, status, nome, telefone, servico, quantidade, valor, observacao })
+            .update({
+              numero_os,
+              status,
+              nome,
+              telefone,
+              servico,
+              quantidade,
+              valor,
+              observacao,
+            })
             .eq("id", id);
           if (error) throw error;
           toast("OS atualizada com sucesso!");
@@ -937,14 +1397,26 @@
       }
 
       async function excluirOS(id) {
-        if (!confirm("Tem certeza que deseja excluir esta OS? As fotos também serão apagadas.")) return;
+        if (
+          !confirm(
+            "Tem certeza que deseja excluir esta OS? As fotos também serão apagadas.",
+          )
+        )
+          return;
         try {
           const os = listaOS.find((o) => o.id === id);
           if (os.fotos_urls && os.fotos_urls.length > 0) {
-            const arquivosParaRemover = os.fotos_urls.map((url) => url.split("/").pop().split("?")[0]);
-            await supabaseClient.storage.from("fotos-ordens").remove(arquivosParaRemover);
+            const arquivosParaRemover = os.fotos_urls.map(
+              (url) => url.split("/").pop().split("?")[0],
+            );
+            await supabaseClient.storage
+              .from("fotos-ordens")
+              .remove(arquivosParaRemover);
           }
-          const { error } = await supabaseClient.from("ordens_servico").delete().eq("id", id);
+          const { error } = await supabaseClient
+            .from("ordens_servico")
+            .delete()
+            .eq("id", id);
           if (error) throw error;
           toast("OS excluída com sucesso!");
           fecharModal();
@@ -958,8 +1430,12 @@
       /* ---------- NAVEGAÇÃO ---------- */
       function mudarView(view) {
         estado.view = view;
-        document.querySelectorAll(".sidebar-link[data-view]").forEach((el) => el.classList.remove("active"));
-        const activeLink = document.querySelector(`.sidebar-link[data-view="${view}"]`);
+        document
+          .querySelectorAll(".sidebar-link[data-view]")
+          .forEach((el) => el.classList.remove("active"));
+        const activeLink = document.querySelector(
+          `.sidebar-link[data-view="${view}"]`,
+        );
         if (activeLink) activeLink.classList.add("active");
 
         document.getElementById("viewDashboard").classList.add("hidden");
@@ -969,15 +1445,18 @@
         if (view === "dashboard") {
           document.getElementById("viewDashboard").classList.remove("hidden");
           document.getElementById("pageTitle").textContent = "Dashboard";
-          document.getElementById("pageSubtitle").textContent = "Visão geral das ordens de serviço";
+          document.getElementById("pageSubtitle").textContent =
+            "Visão geral das ordens de serviço";
         } else if (view === "os") {
           document.getElementById("viewOS").classList.remove("hidden");
           document.getElementById("pageTitle").textContent = "Todas as OS";
-          document.getElementById("pageSubtitle").textContent = "Gerencie as ordens de serviço";
+          document.getElementById("pageSubtitle").textContent =
+            "Gerencie as ordens de serviço";
         } else if (view === "fotos") {
           document.getElementById("viewFotos").classList.remove("hidden");
           document.getElementById("pageTitle").textContent = "Galeria de Fotos";
-          document.getElementById("pageSubtitle").textContent = "Todas as imagens enviadas";
+          document.getElementById("pageSubtitle").textContent =
+            "Todas as imagens enviadas";
         }
 
         fecharSidebar();
@@ -991,8 +1470,12 @@
       document.querySelectorAll(".sidebar-link[data-filter]").forEach((el) => {
         el.addEventListener("click", () => {
           estado.filtroStatus = el.dataset.filter;
-          document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
-          const match = document.querySelector(`.filter-btn[data-status="${el.dataset.filter}"]`);
+          document
+            .querySelectorAll(".filter-btn")
+            .forEach((b) => b.classList.remove("active"));
+          const match = document.querySelector(
+            `.filter-btn[data-status="${el.dataset.filter}"]`,
+          );
           if (match) match.classList.add("active");
           mudarView("os");
           renderOS();
@@ -1001,7 +1484,9 @@
 
       document.querySelectorAll(".filter-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
-          document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+          document
+            .querySelectorAll(".filter-btn")
+            .forEach((b) => b.classList.remove("active"));
           btn.classList.add("active");
           estado.filtroStatus = btn.dataset.status;
           renderOS();
@@ -1019,11 +1504,12 @@
         renderOS();
       });
 
-      document.getElementById("modalDetalhes").addEventListener("click", (e) => {
-        if (e.target.id === "modalDetalhes") fecharModal();
-      });
+      document
+        .getElementById("modalDetalhes")
+        .addEventListener("click", (e) => {
+          if (e.target.id === "modalDetalhes") fecharModal();
+        });
 
-      // Fecha sidebar ao redimensionar para desktop
       window.addEventListener("resize", () => {
         if (window.innerWidth >= 1024) fecharSidebar();
       });
