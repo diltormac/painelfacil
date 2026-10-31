@@ -24,6 +24,22 @@
         font-family: "Inter", sans-serif;
       }
 
+      /* CAPS LOCK AUTOMÁTICO NOS INPUTS DE TEXTO */
+      input[type="text"],
+      textarea {
+        text-transform: uppercase;
+      }
+      input[type="text"]::placeholder,
+      textarea::placeholder {
+        text-transform: none;
+      }
+      input[type="tel"],
+      input[type="number"],
+      input[type="email"],
+      input[type="password"] {
+        text-transform: none;
+      }
+
       ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -161,7 +177,7 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        height: 34px; /* Altura fixa para igualar com o select */
+        height: 34px;
       }
       .filter-btn:hover {
         background: #f1f5f9;
@@ -267,7 +283,7 @@
       .lightbox {
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.9);
+        background: rgba(0, 0, 0, 0.92);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -283,21 +299,23 @@
       }
       .lightbox img {
         max-width: 100%;
-        max-height: 90vh;
+        max-height: 85vh;
         border-radius: 8px;
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
         transform: scale(0.95);
         transition: transform 0.3s;
+        user-select: none;
       }
       .lightbox.show img {
         transform: scale(1);
       }
+
       .lightbox-close {
         position: absolute;
         top: 16px;
         right: 16px;
-        width: 40px;
-        height: 40px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.1);
         color: white;
@@ -308,9 +326,56 @@
         transition: background 0.2s;
         font-size: 20px;
         border: none;
+        z-index: 210;
       }
       .lightbox-close:hover {
         background: rgba(255, 255, 255, 0.2);
+      }
+
+      .lightbox-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.2s;
+        font-size: 18px;
+        border: none;
+        z-index: 210;
+      }
+      .lightbox-nav:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-50%) scale(1.1);
+      }
+      .lightbox-nav.prev {
+        left: 16px;
+      }
+      .lightbox-nav.next {
+        right: 16px;
+      }
+
+      .lightbox-counter {
+        position: absolute;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        z-index: 210;
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
 
       .edit-input {
@@ -327,31 +392,6 @@
       .edit-input:focus {
         border-color: #435edb;
         box-shadow: 0 0 0 2px rgba(67, 94, 219, 0.1);
-      }
-
-      /* Botão de copiar */
-      .copy-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 24px;
-        height: 24px;
-        border-radius: 6px;
-        border: 1px solid #e2e8f0;
-        background: #f8fafc;
-        color: #64748b;
-        cursor: pointer;
-        transition: all 0.15s;
-        font-size: 10px;
-        flex-shrink: 0;
-      }
-      .copy-btn:hover {
-        background: #435edb;
-        color: white;
-        border-color: #435edb;
-      }
-      .copy-btn:active {
-        transform: scale(0.92);
       }
     </style>
   </head>
@@ -589,7 +629,11 @@
               </p>
             </div>
 
-            <div class="stat-card">
+            <!-- CARD DE FATURAMENTO COM SENHA -->
+            <div
+              class="stat-card cursor-pointer relative overflow-hidden group"
+              onclick="alternarFaturamento()"
+            >
               <div class="flex items-start justify-between mb-2 lg:mb-3">
                 <div
                   class="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-emerald-50 flex items-center justify-center"
@@ -598,12 +642,20 @@
                     class="fa-solid fa-dollar-sign text-emerald-600 text-sm lg:text-base"
                   ></i>
                 </div>
+                <span
+                  class="text-slate-400 group-hover:text-slate-600 transition-colors"
+                >
+                  <i
+                    id="iconeCadeado"
+                    class="fa-solid fa-eye-slash text-xs"
+                  ></i>
+                </span>
               </div>
               <p
                 class="text-sm lg:text-xl font-extrabold text-slate-800 whitespace-nowrap overflow-hidden text-ellipsis"
                 id="statFaturamento"
               >
-                R$ 0,00
+                ••••••
               </p>
               <p
                 class="text-[10px] lg:text-xs text-slate-500 mt-1 leading-tight"
@@ -672,6 +724,7 @@
             </select>
           </div>
 
+          <!-- Tabela (desktop) -->
           <div
             id="desktopOSWrapper"
             class="hidden lg:block bg-white border border-slate-200 rounded-2xl overflow-hidden"
@@ -680,42 +733,47 @@
               <thead class="bg-slate-50 border-b border-slate-200">
                 <tr>
                   <th
-                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3"
+                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3"
                   >
                     Nº OS
                   </th>
                   <th
-                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3"
+                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3"
                   >
                     Cliente
                   </th>
                   <th
-                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3"
+                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3"
                   >
                     Telefone
                   </th>
                   <th
-                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3"
+                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3"
                   >
                     Serviço
                   </th>
                   <th
-                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3"
+                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3"
                   >
-                    Qtd
+                    Cor
                   </th>
                   <th
-                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3"
+                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3"
+                  >
+                    Origem
+                  </th>
+                  <th
+                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3"
                   >
                     Valor
                   </th>
                   <th
-                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3"
+                    class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3"
                   >
                     Status
                   </th>
                   <th
-                    class="text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3"
+                    class="text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3"
                   >
                     Ações
                   </th>
@@ -725,10 +783,12 @@
             </table>
           </div>
 
+          <!-- Cards (mobile / tablet) -->
           <div id="mobileOSWrapper" class="lg:hidden space-y-3">
             <div id="mobileList" class="space-y-3"></div>
           </div>
 
+          <!-- Estado vazio (compartilhado) -->
           <div
             id="emptyState"
             class="hidden bg-white border border-slate-200 rounded-2xl px-5 py-16 text-center"
@@ -821,12 +881,37 @@
       <button class="lightbox-close" onclick="fecharLightbox(event)">
         <i class="fa-solid fa-xmark"></i>
       </button>
+
+      <button
+        id="lightboxPrev"
+        class="lightbox-nav prev hidden"
+        onclick="
+          event.stopPropagation();
+          navegarLightbox(-1);
+        "
+      >
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+
       <img
         id="lightboxImg"
         src=""
         alt="Visualização da foto"
         onclick="event.stopPropagation()"
       />
+
+      <button
+        id="lightboxNext"
+        class="lightbox-nav next hidden"
+        onclick="
+          event.stopPropagation();
+          navegarLightbox(1);
+        "
+      >
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+
+      <div id="lightboxCounter" class="lightbox-counter hidden">1 / 1</div>
     </div>
 
     <div id="toast" class="toast"></div>
@@ -834,6 +919,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
+      // SENHA PARA EXIBIR O FATURAMENTO
+      const SENHA_FATURAMENTO = "admin123";
+      let exibirFaturamento =
+        sessionStorage.getItem("@osfacil_faturamento") === "true";
+
       const supabaseUrl = "https://kiiswukzwwoznkgjyaod.supabase.co";
       const supabaseKey = "sb_publishable_WPRvraB-40Fz1RuKbd5bRg_3tGvyAxg";
       const { createClient } = supabase;
@@ -846,6 +936,11 @@
         busca: "",
         ordenacao: "data-desc",
       };
+
+      let galeriaLightbox = [];
+      let indexLightboxAtual = 0;
+      let touchStartX = 0;
+      let touchEndX = 0;
 
       const statusClass = {
         Pendente: "badge-pendente",
@@ -886,38 +981,24 @@
         setTimeout(() => el.classList.remove("show"), 3000);
       }
 
-      /* ---------- COPIAR TEXTO ---------- */
-      async function copiarTexto(texto, botao) {
-        if (!texto || !texto.trim()) {
-          toast("Nada para copiar.", "error");
-          return;
-        }
-        try {
-          if (navigator.clipboard && window.isSecureContext) {
-            await navigator.clipboard.writeText(texto);
-          } else {
-            const ta = document.createElement("textarea");
-            ta.value = texto;
-            ta.style.position = "fixed";
-            ta.style.opacity = "0";
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand("copy");
-            document.body.removeChild(ta);
+      /* ---------- SISTEMA DE SENHA DO FATURAMENTO ---------- */
+      function alternarFaturamento() {
+        if (exibirFaturamento) {
+          // Se já está visível, esconde (faz logout)
+          exibirFaturamento = false;
+          sessionStorage.removeItem("@osfacil_faturamento");
+          renderDashboard();
+        } else {
+          // Se está oculto, pede a senha
+          const senha = prompt("Digite a senha para visualizar o faturamento:");
+          if (senha === SENHA_FATURAMENTO) {
+            exibirFaturamento = true;
+            sessionStorage.setItem("@osfacil_faturamento", "true");
+            renderDashboard();
+            toast("Faturamento liberado!");
+          } else if (senha !== null) {
+            toast("Senha incorreta!", "error");
           }
-          toast("Copiado!");
-          if (botao) {
-            const icon = botao.querySelector("i");
-            if (icon) {
-              icon.className = "fa-solid fa-check";
-              setTimeout(() => {
-                icon.className = "fa-solid fa-copy";
-              }, 1500);
-            }
-          }
-        } catch (err) {
-          console.error(err);
-          toast("Erro ao copiar.", "error");
         }
       }
 
@@ -934,13 +1015,51 @@
       }
 
       /* ---------- LIGHTBOX ---------- */
-      function abrirLightbox(url) {
-        if (!url) return;
-        const img = document.getElementById("lightboxImg");
-        const box = document.getElementById("lightbox");
-        img.src = url;
-        box.classList.add("show");
+      function abrirLightboxPorOS(osId, indexInicial = 0) {
+        const os = listaOS.find((o) => o.id === osId);
+        if (!os || !os.fotos_urls || os.fotos_urls.length === 0) return;
+
+        galeriaLightbox = os.fotos_urls;
+        indexLightboxAtual = indexInicial;
+
+        document.getElementById("lightbox").classList.add("show");
+        atualizarLightbox();
       }
+
+      function atualizarLightbox() {
+        const img = document.getElementById("lightboxImg");
+        const prevBtn = document.getElementById("lightboxPrev");
+        const nextBtn = document.getElementById("lightboxNext");
+        const counter = document.getElementById("lightboxCounter");
+
+        img.style.opacity = 0;
+
+        setTimeout(() => {
+          img.src = galeriaLightbox[indexLightboxAtual];
+          img.style.opacity = 1;
+        }, 150);
+
+        if (galeriaLightbox.length > 1) {
+          prevBtn.classList.remove("hidden");
+          nextBtn.classList.remove("hidden");
+          counter.classList.remove("hidden");
+          counter.textContent = `${indexLightboxAtual + 1} / ${galeriaLightbox.length}`;
+        } else {
+          prevBtn.classList.add("hidden");
+          nextBtn.classList.add("hidden");
+          counter.classList.add("hidden");
+        }
+      }
+
+      function navegarLightbox(direcao) {
+        indexLightboxAtual += direcao;
+        if (indexLightboxAtual >= galeriaLightbox.length)
+          indexLightboxAtual = 0;
+        if (indexLightboxAtual < 0)
+          indexLightboxAtual = galeriaLightbox.length - 1;
+        atualizarLightbox();
+      }
+
       function fecharLightbox(event) {
         if (
           event.target.id === "lightbox" ||
@@ -950,9 +1069,31 @@
           box.classList.remove("show");
           setTimeout(() => {
             document.getElementById("lightboxImg").src = "";
+            galeriaLightbox = [];
           }, 300);
         }
       }
+
+      document.getElementById("lightbox").addEventListener(
+        "touchstart",
+        (e) => {
+          touchStartX = e.changedTouches[0].screenX;
+        },
+        { passive: true },
+      );
+
+      document.getElementById("lightbox").addEventListener(
+        "touchend",
+        (e) => {
+          touchEndX = e.changedTouches[0].screenX;
+          if (galeriaLightbox.length > 1) {
+            const limite = 50;
+            if (touchEndX < touchStartX - limite) navegarLightbox(1);
+            if (touchEndX > touchStartX + limite) navegarLightbox(-1);
+          }
+        },
+        { passive: true },
+      );
 
       /* ---------- CARREGAMENTO ---------- */
       async function carregarDados() {
@@ -989,12 +1130,21 @@
           (o) => o.status === "Em andamento",
         ).length;
 
+        // Lógica do Faturamento Protegido
         const faturamentoTotal = listaOS.reduce(
           (acc, curr) => acc + (Number(curr.valor) || 0),
           0,
         );
-        document.getElementById("statFaturamento").textContent =
-          formatarMoeda(faturamentoTotal);
+        const elFaturamento = document.getElementById("statFaturamento");
+        const elIcone = document.getElementById("iconeCadeado");
+
+        if (exibirFaturamento) {
+          elFaturamento.textContent = formatarMoeda(faturamentoTotal);
+          elIcone.className = "fa-solid fa-eye text-xs";
+        } else {
+          elFaturamento.textContent = "••••••";
+          elIcone.className = "fa-solid fa-eye-slash text-xs";
+        }
 
         document.getElementById("badgeTotal").textContent = listaOS.length;
         document.getElementById("badgePendente").textContent = listaOS.filter(
@@ -1024,13 +1174,20 @@
               iconColor = "text-green-500 bg-green-50";
             if (o.status === "Cancelado") iconColor = "text-red-500 bg-red-50";
             const numeroFormatado = o.numero_os || `#${o.id}`;
+            const temFoto = o.fotos_urls && o.fotos_urls.length > 0;
 
             return `
             <div class="flex flex-col lg:flex-row lg:items-center justify-between px-4 lg:px-6 py-4 hover:bg-slate-50 transition cursor-pointer border-b border-slate-100 last:border-0 group" onclick="abrirDetalhes(${o.id})">
               <div class="flex items-start lg:items-center gap-3 lg:gap-4 min-w-0">
-                <div class="w-11 h-11 lg:w-12 lg:h-12 rounded-xl ${iconColor} flex items-center justify-center flex-shrink-0 border border-white shadow-sm group-hover:scale-105 transition-transform mt-1 lg:mt-0">
-                  <i class="fa-solid fa-clipboard text-base lg:text-lg"></i>
-                </div>
+                
+                ${
+                  temFoto
+                    ? `<img src="${o.fotos_urls[0]}" class="w-11 h-11 lg:w-12 lg:h-12 rounded-xl object-cover border border-slate-200 shadow-sm flex-shrink-0 cursor-pointer hover:opacity-80 transition" onclick="event.stopPropagation(); abrirLightboxPorOS(${o.id}, 0)" title="Ver foto" />`
+                    : `<div class="w-11 h-11 lg:w-12 lg:h-12 rounded-xl ${iconColor} flex items-center justify-center flex-shrink-0 border border-white shadow-sm mt-1 lg:mt-0">
+                      <i class="fa-solid fa-clipboard text-base lg:text-lg"></i>
+                     </div>`
+                }
+
                 <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-2 flex-wrap">
                     <p class="text-sm lg:text-base font-bold text-slate-800 truncate">${o.nome}</p>
@@ -1040,6 +1197,7 @@
                     <span class="text-[10px] lg:text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 truncate max-w-[160px]">
                       <i class="fa-solid fa-wrench text-slate-400 mr-1"></i>${o.servico}
                     </span>
+                    ${o.cor ? `<span class="text-[10px] lg:text-[11px] font-medium text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200"><i class="fa-solid fa-palette mr-1"></i>${o.cor}</span>` : ""}
                     <span class="text-[10px] lg:text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                       <i class="fa-solid fa-hashtag text-slate-400 mr-1"></i>${o.quantidade}
                     </span>
@@ -1061,9 +1219,12 @@
               <div class="flex items-center gap-3 lg:gap-6 mt-3 lg:mt-0 flex-shrink-0 justify-between pl-14 lg:pl-0">
                 <div class="flex flex-col lg:items-end">
                   ${badge(o.status)}
-                  <p class="text-[10px] lg:text-[11px] text-slate-400 mt-1 font-medium">
-                    <i class="fa-regular fa-calendar mr-1"></i>${formatarData(o.created_at)}
-                  </p>
+                  <div class="flex items-center gap-2 mt-1 flex-wrap lg:justify-end">
+                    <p class="text-[10px] lg:text-[11px] text-slate-400 font-medium">
+                      <i class="fa-regular fa-calendar mr-1"></i>${formatarData(o.created_at)}
+                    </p>
+                    ${o.aparelho ? `<span class="text-[9px] lg:text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200" title="Aparelho de Origem"><i class="fa-solid fa-mobile-screen text-[8px] mr-1"></i>${o.aparelho}</span>` : ""}
+                  </div>
                 </div>
                 <div class="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 group-hover:border-indigo-200 transition flex-shrink-0">
                   <i class="fa-solid fa-chevron-right text-xs"></i>
@@ -1093,6 +1254,8 @@
               String(o.id).includes(q) ||
               (o.numero_os && o.numero_os.toLowerCase().includes(q)) ||
               o.servico.toLowerCase().includes(q) ||
+              (o.cor && o.cor.toLowerCase().includes(q)) ||
+              (o.aparelho && o.aparelho.toLowerCase().includes(q)) ||
               String(o.valor).includes(q),
           );
         }
@@ -1134,31 +1297,38 @@
         desktopWrapper.style.display = "";
         mobileWrapper.style.display = "";
 
+        // Tabela desktop
         tbody.innerHTML = osFiltradas
           .map((o) => {
             const numeroFormatado = o.numero_os || `#${o.id}`;
+            const temFoto = o.fotos_urls && o.fotos_urls.length > 0;
             return `
             <tr class="table-row">
-              <td class="px-5 py-3.5"><span class="text-xs font-bold text-indigo-600">${numeroFormatado}</span></td>
-              <td class="px-5 py-3.5">
+              <td class="px-4 py-3.5"><span class="text-xs font-bold text-indigo-600">${numeroFormatado}</span></td>
+              <td class="px-4 py-3.5">
                 <div class="flex items-center gap-2.5">
-                  <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 flex-shrink-0">
-                    ${o.nome
-                      .split(" ")
-                      .map((n) => n[0])
-                      .slice(0, 2)
-                      .join("")
-                      .toUpperCase()}
-                  </div>
-                  <span class="text-sm font-semibold text-slate-800">${o.nome}</span>
+                  ${
+                    temFoto
+                      ? `<img src="${o.fotos_urls[0]}" class="w-8 h-8 rounded-full object-cover border border-slate-200 cursor-pointer hover:opacity-80 transition" onclick="event.stopPropagation(); abrirLightboxPorOS(${o.id}, 0)" title="Ver foto" />`
+                      : `<div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 flex-shrink-0">
+                        ${o.nome
+                          .split(" ")
+                          .map((n) => n[0])
+                          .slice(0, 2)
+                          .join("")
+                          .toUpperCase()}
+                       </div>`
+                  }
+                  <span class="text-sm font-semibold text-slate-800 truncate max-w-[120px] xl:max-w-[180px]" title="${o.nome}">${o.nome}</span>
                 </div>
               </td>
-              <td class="px-5 py-3.5 text-xs text-slate-600">${o.telefone}</td>
-              <td class="px-5 py-3.5 text-xs text-slate-700 font-medium">${o.servico}</td>
-              <td class="px-5 py-3.5 text-xs text-slate-700 font-medium">${o.quantidade}</td>
-              <td class="px-5 py-3.5 text-xs font-bold text-emerald-600">${formatarMoeda(o.valor)}</td>
-              <td class="px-5 py-3.5">${badge(o.status)}</td>
-              <td class="px-5 py-3.5 text-right">
+              <td class="px-4 py-3.5 text-xs text-slate-600">${o.telefone}</td>
+              <td class="px-4 py-3.5 text-xs text-slate-700 font-medium">${o.servico} <span class="text-slate-400 font-normal">(${o.quantidade})</span></td>
+              <td class="px-4 py-3.5 text-xs text-slate-700 font-medium">${o.cor || "-"}</td>
+              <td class="px-4 py-3.5 text-xs text-slate-500 font-medium">${o.aparelho || "-"}</td>
+              <td class="px-4 py-3.5 text-xs font-bold text-emerald-600">${formatarMoeda(o.valor)}</td>
+              <td class="px-4 py-3.5">${badge(o.status)}</td>
+              <td class="px-4 py-3.5 text-right">
                 <button onclick="abrirDetalhes(${o.id})" class="w-8 h-8 rounded-lg hover:bg-slate-200 text-slate-600 inline-flex items-center justify-center transition" title="Ver / Editar">
                   <i class="fa-solid fa-pen-to-square text-sm"></i>
                 </button>
@@ -1168,22 +1338,27 @@
           })
           .join("");
 
+        // Cards mobile
         mobileList.innerHTML = osFiltradas
           .map((o) => {
             const numeroFormatado = o.numero_os || `#${o.id}`;
-            const initials = o.nome
-              .split(" ")
-              .map((n) => n[0])
-              .slice(0, 2)
-              .join("")
-              .toUpperCase();
+            const temFoto = o.fotos_urls && o.fotos_urls.length > 0;
             return `
             <div class="bg-white border border-slate-200 rounded-2xl p-4 active:bg-slate-50 transition cursor-pointer" onclick="abrirDetalhes(${o.id})">
               <div class="flex items-start justify-between gap-3 mb-3">
                 <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                  <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 flex-shrink-0">
-                    ${initials}
-                  </div>
+                  ${
+                    temFoto
+                      ? `<img src="${o.fotos_urls[0]}" class="w-10 h-10 rounded-full object-cover border border-slate-200 cursor-pointer hover:opacity-80 flex-shrink-0" onclick="event.stopPropagation(); abrirLightboxPorOS(${o.id}, 0)" />`
+                      : `<div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 flex-shrink-0">
+                        ${o.nome
+                          .split(" ")
+                          .map((n) => n[0])
+                          .slice(0, 2)
+                          .join("")
+                          .toUpperCase()}
+                       </div>`
+                  }
                   <div class="min-w-0">
                     <p class="text-sm font-bold text-slate-800 truncate">${o.nome}</p>
                     <p class="text-[11px] text-slate-500 truncate">${o.telefone}</p>
@@ -1191,16 +1366,28 @@
                 </div>
                 <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md flex-shrink-0">${numeroFormatado}</span>
               </div>
-              <div class="grid grid-cols-2 gap-2 mb-3">
-                <div class="bg-slate-50 rounded-lg px-2.5 py-1.5 min-w-0">
+              
+              <!-- BLOCOS SEPARADOS: SERVIÇO, COR E ORIGEM -->
+              <div class="flex flex-wrap gap-2 mb-3">
+                <div class="bg-slate-50 rounded-lg px-2.5 py-1.5 flex-1 min-w-[120px]">
                   <p class="text-[9px] uppercase text-slate-400 font-bold tracking-wider">Serviço</p>
-                  <p class="text-[11px] font-medium text-slate-700 truncate">${o.servico}</p>
+                  <p class="text-[11px] font-medium text-slate-700 truncate">${o.servico} (Qtd: ${o.quantidade})</p>
                 </div>
-                <div class="bg-slate-50 rounded-lg px-2.5 py-1.5">
-                  <p class="text-[9px] uppercase text-slate-400 font-bold tracking-wider">Quantidade</p>
-                  <p class="text-[11px] font-medium text-slate-700">${o.quantidade} un.</p>
+                ${
+                  o.cor
+                    ? `
+                <div class="bg-indigo-50 border border-indigo-100 rounded-lg px-2.5 py-1.5 flex-1 min-w-[120px]">
+                  <p class="text-[9px] uppercase text-indigo-400 font-bold tracking-wider">Cor</p>
+                  <p class="text-[11px] font-semibold text-indigo-700 truncate">${o.cor}</p>
+                </div>`
+                    : ""
+                }
+                <div class="bg-slate-50 rounded-lg px-2.5 py-1.5 flex-1 min-w-[120px]">
+                  <p class="text-[9px] uppercase text-slate-400 font-bold tracking-wider">Aparelho Origem</p>
+                  <p class="text-[11px] font-medium text-slate-700 truncate" title="${o.aparelho || "-"}"><i class="fa-solid fa-mobile-screen text-[9px] mr-1 text-slate-400"></i>${o.aparelho || "-"}</p>
                 </div>
               </div>
+
               <div class="flex items-center justify-between pt-3 border-t border-slate-100">
                 ${badge(o.status)}
                 <p class="text-sm font-bold text-emerald-600">${formatarMoeda(o.valor)}</p>
@@ -1216,8 +1403,8 @@
         const todasFotos = [];
         listaOS.forEach((o) => {
           if (o.fotos_urls && Array.isArray(o.fotos_urls)) {
-            o.fotos_urls.forEach((url) => {
-              if (url) todasFotos.push({ os: o, url });
+            o.fotos_urls.forEach((url, index) => {
+              if (url) todasFotos.push({ os: o, url, index });
             });
           }
         });
@@ -1236,12 +1423,12 @@
 
         grid.innerHTML = todasFotos
           .map(
-            ({ os, url }) => `
-          <div class="relative group cursor-pointer" onclick="abrirLightbox('${url}')">
+            ({ os, url, index }) => `
+          <div class="relative group cursor-pointer" onclick="abrirLightboxPorOS(${os.id}, ${index})">
             <img src="${url}" alt="Foto ${os.id}" class="photo-thumb">
             <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 rounded-b-[10px] opacity-0 group-hover:opacity-100 transition pointer-events-none">
               <p class="text-[10px] font-bold text-white truncate">${os.nome}</p>
-              <p class="text-[9px] text-white/70 truncate">${os.numero_os || "#" + os.id}</p>
+              <p class="text-[9px] text-white/70 truncate">${os.numero_os || "#" + os.id} (${index + 1}/${os.fotos_urls.length})</p>
             </div>
           </div>
         `,
@@ -1249,18 +1436,44 @@
           .join("");
       }
 
-      /* ---------- MODAL ---------- */
       function abrirDetalhes(id) {
         const os = listaOS.find((o) => o.id === id);
         if (!os) return;
 
         document.getElementById("modalTitle").textContent = `Editar OS`;
-        document.getElementById("modalSubtitle").textContent =
-          `Criada em ${formatarData(os.created_at)}`;
+
+        // APARELHO DE ORIGEM DE FORMA DISCRETA NO SUBTÍTULO
+        const aparelhoDiscreto = os.aparelho
+          ? `<span class="ml-2 bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded border border-slate-200"><i class="fa-solid fa-mobile-screen mr-1"></i>${os.aparelho}</span>`
+          : "";
+        document.getElementById("modalSubtitle").innerHTML =
+          `Criada em ${formatarData(os.created_at)} ${aparelhoDiscreto}`;
+
+        let itensHTML = `<p class="text-xs text-slate-500 italic">Nenhum item detalhado.</p>`;
+        if (
+          os.itens_servicos &&
+          Array.isArray(os.itens_servicos) &&
+          os.itens_servicos.length > 0
+        ) {
+          itensHTML = os.itens_servicos
+            .map(
+              (item, idx) => `
+            <div class="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs">
+              <div>
+                <span class="font-bold text-slate-800">${item.servico}</span>
+                <span class="text-slate-500 ml-2">Qtd: ${item.quantidade}</span>
+                ${item.cor ? `<span class="ml-2 text-indigo-600 font-medium">Cor: ${item.cor}</span>` : ""}
+              </div>
+              <span class="font-bold text-emerald-600">${formatarMoeda(item.valor)}</span>
+            </div>
+          `,
+            )
+            .join("");
+        }
 
         const fotosHTML =
           os.fotos_urls && os.fotos_urls.length
-            ? `<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">${os.fotos_urls.map((url) => `<div onclick="abrirLightbox('${url}')"><img src="${url}" class="photo-thumb"></div>`).join("")}</div>`
+            ? `<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">${os.fotos_urls.map((url, idx) => `<div onclick="abrirLightboxPorOS(${os.id}, ${idx})"><img src="${url}" class="photo-thumb"></div>`).join("")}</div>`
             : `<p class="text-xs text-slate-500 italic bg-slate-50 p-4 rounded-lg text-center">Nenhuma foto cadastrada nesta OS.</p>`;
 
         document.getElementById("modalBody").innerHTML = `
@@ -1282,52 +1495,30 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <div class="flex items-center justify-between mb-1">
-                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Nome do Cliente</label>
-                <button class="copy-btn" onclick="copiarTexto(document.getElementById('editNome').value, this)" title="Copiar nome">
-                  <i class="fa-solid fa-copy"></i>
-                </button>
-              </div>
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Nome do Cliente</label>
               <input type="text" id="editNome" value="${os.nome}" class="edit-input" />
             </div>
             <div>
-              <div class="flex items-center justify-between mb-1">
-                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Telefone</label>
-                <button class="copy-btn" onclick="copiarTexto(document.getElementById('editTelefone').value, this)" title="Copiar telefone">
-                  <i class="fa-solid fa-copy"></i>
-                </button>
-              </div>
-              <input type="text" id="editTelefone" value="${os.telefone}" class="edit-input" />
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Telefone</label>
+              <input type="tel" id="editTelefone" value="${os.telefone}" class="edit-input" />
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-            <div class="sm:col-span-1">
-              <div class="flex items-center justify-between mb-1">
-                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Serviço</label>
-                <button class="copy-btn" onclick="copiarTexto(document.getElementById('editServico').value, this)" title="Copiar serviço">
-                  <i class="fa-solid fa-copy"></i>
-                </button>
-              </div>
-              <input type="text" id="editServico" value="${os.servico}" class="edit-input" />
-            </div>
-            <div>
-              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Quantidade</label>
-              <input type="number" id="editQuantidade" value="${os.quantidade}" class="edit-input" />
-            </div>
-            <div>
-              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Valor (R$)</label>
-              <input type="number" step="0.01" id="editValor" value="${os.valor}" class="edit-input font-bold text-emerald-600" />
+          <!-- LISTAGEM DOS ITENS MÚLTIPLOS (JSON) -->
+          <div>
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">Serviços Realizados (Itens)</label>
+            <div class="space-y-2 max-h-40 overflow-y-auto mb-2">
+              ${itensHTML}
             </div>
           </div>
 
           <div>
-            <div class="flex items-center justify-between mb-1">
-              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Descrição / Observação</label>
-              <button class="copy-btn" onclick="copiarTexto(document.getElementById('editObservacao').value, this)" title="Copiar observação">
-                <i class="fa-solid fa-copy"></i>
-              </button>
-            </div>
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Valor Total (R$)</label>
+            <input type="number" step="0.01" id="editValor" value="${os.valor}" class="edit-input font-bold text-emerald-600" />
+          </div>
+
+          <div>
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Descrição / Observação</label>
             <textarea id="editObservacao" class="edit-input h-24 resize-none">${os.observacao || ""}</textarea>
           </div>
 
@@ -1354,18 +1545,22 @@
       }
 
       async function salvarEdicoes(id) {
-        const numero_os = document.getElementById("editNumeroOS").value.trim();
+        const numero_os = document
+          .getElementById("editNumeroOS")
+          .value.trim()
+          .toUpperCase();
         const status = document.getElementById("editStatus").value;
-        const nome = document.getElementById("editNome").value.trim();
+        const nome = document
+          .getElementById("editNome")
+          .value.trim()
+          .toUpperCase();
         const telefone = document.getElementById("editTelefone").value.trim();
-        const servico = document.getElementById("editServico").value.trim();
-        const quantidade =
-          parseInt(document.getElementById("editQuantidade").value) || 1;
         const valor =
           parseFloat(document.getElementById("editValor").value) || 0;
         const observacao = document
           .getElementById("editObservacao")
-          .value.trim();
+          .value.trim()
+          .toUpperCase();
 
         if (!nome || !telefone) {
           toast("Nome e Telefone são obrigatórios.", "error");
@@ -1375,16 +1570,7 @@
         try {
           const { error } = await supabaseClient
             .from("ordens_servico")
-            .update({
-              numero_os,
-              status,
-              nome,
-              telefone,
-              servico,
-              quantidade,
-              valor,
-              observacao,
-            })
+            .update({ numero_os, status, nome, telefone, valor, observacao })
             .eq("id", id);
           if (error) throw error;
           toast("OS atualizada com sucesso!");
@@ -1510,6 +1696,7 @@
           if (e.target.id === "modalDetalhes") fecharModal();
         });
 
+      // Fecha sidebar ao redimensionar para desktop
       window.addEventListener("resize", () => {
         if (window.innerWidth >= 1024) fecharSidebar();
       });
